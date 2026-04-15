@@ -6,6 +6,13 @@ require Pod::Executable.execute_command('node', ['-p',
   )', __dir__]).strip
 
 platform :ios, min_ios_version_supported
+
+# Prebuilt RN artifacts use file:// URLs from paths under ios/Pods; spaces in the
+# absolute path (e.g. "Upwork Projects") break URI::File ("bad component ...") and
+# CocoaPods then reports React-Core-prebuilt missing `source`. Build from source instead.
+ENV['RCT_USE_RN_DEP'] = '0'
+ENV['RCT_USE_PREBUILT_RNCORE'] = '0'
+
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
