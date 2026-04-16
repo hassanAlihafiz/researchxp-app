@@ -1,9 +1,35 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function HelpScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useAppTheme();
+
+  const styles = useMemo(
+    () =>
+      StyleSheet.create({
+        root: {
+          flex: 1,
+          paddingHorizontal: 24,
+          backgroundColor: colors.background,
+        },
+        title: {
+          fontSize: 22,
+          fontWeight: '700',
+          color: colors.text,
+          marginBottom: 8,
+        },
+        body: {
+          fontSize: 15,
+          color: colors.textSecondary,
+          lineHeight: 22,
+        },
+      }),
+    [colors],
+  );
+
   return (
     <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
       <Text style={styles.title}>Help</Text>
@@ -13,22 +39,3 @@ export default function HelpScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    paddingHorizontal: 24,
-    backgroundColor: '#0b0f14',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#f2f4f7',
-    marginBottom: 8,
-  },
-  body: {
-    fontSize: 15,
-    color: '#9aa4b2',
-    lineHeight: 22,
-  },
-});

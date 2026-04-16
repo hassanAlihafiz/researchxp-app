@@ -1,7 +1,6 @@
 export type RootStackParamList = {
   Splash: undefined;
   Login: undefined;
-  SecondFactor: { email: string };
   Main: undefined;
 };
 
@@ -13,6 +12,6 @@ export type MainDrawerParamList = {
 
 export type MainTabParamList = {
   Home: undefined;
-  Explore: undefined;
-  Activity: undefined;
+  Rewards: undefined;
+  Profile: undefined;
 };

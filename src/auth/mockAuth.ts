@@ -1,6 +1,5 @@
 /**
  * Replace with real API calls. Demo accepts any non-empty credentials.
- * Demo MFA code: 123456
  */
 export async function loginWithPassword(
   email: string,
@@ -15,11 +14,6 @@ export async function loginWithPassword(
     return { ok: false, message: 'Enter a valid email address.' };
   }
   return { ok: true };
-}
-
-export async function verifySecondFactorCode(code: string): Promise<boolean> {
-  await delay(400);
-  return /^\d{6}$/.test(code) && code === '123456';
 }
 
 function delay(ms: number) {
