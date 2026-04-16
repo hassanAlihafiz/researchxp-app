@@ -3,21 +3,31 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import type { MainDrawerParamList } from './types';
+import { useAppTheme } from '../theme/ThemeContext';
 
 /**
- * Opens the parent drawer from screens nested under a bottom-tab navigator.
- * DrawerToggleButton often renders nothing here; use the drawer API instead.
+ * Opens the app drawer. Uses a text glyph so the control stays visible across
+ * themes (vector-based DrawerToggleButton can fail to render in some setups).
  */
 export function DrawerMenuButton() {
   const navigation = useNavigation();
+  const { colors } = useAppTheme();
 
   const onPress = useCallback(() => {
-    const drawer = navigation.getParent<DrawerNavigationProp<MainDrawerParamList>>();
-    if (drawer) {
-      drawer.openDrawer();
-    } else {
-      navigation.dispatch(DrawerActions.openDrawer());
+    const nav = navigation as DrawerNavigationProp<MainDrawerParamList> & {
+      openDrawer?: () => void;
+    };
+    if (typeof nav.openDrawer === 'function') {
+      nav.openDrawer();
+      return;
     }
+    const parent =
+      navigation.getParent<DrawerNavigationProp<MainDrawerParamList>>();
+    if (parent && typeof parent.openDrawer === 'function') {
+      parent.openDrawer();
+      return;
+    }
+    navigation.dispatch(DrawerActions.openDrawer());
   }, [navigation]);
 
   return (
@@ -27,7 +37,7 @@ export function DrawerMenuButton() {
       hitSlop={12}
       accessibilityRole="button"
       accessibilityLabel="Open navigation menu">
-      <Text style={styles.icon}>☰</Text>
+      <Text style={[styles.icon, { color: colors.text }]}>☰</Text>
     </Pressable>
   );
 }
@@ -41,7 +51,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    color: '#f2f4f7',
     fontSize: 22,
     fontWeight: '600',
   },

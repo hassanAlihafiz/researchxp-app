@@ -17,6 +17,17 @@ jest.mock('react-native-gesture-handler', () => {
   };
 });
 
+jest.mock('@react-native-async-storage/async-storage', () =>
+  require('@react-native-async-storage/async-storage/jest'),
+);
+
+jest.mock('react-native-vector-icons/Ionicons', () => {
+  const React = require('react');
+  const { Text } = require('react-native');
+  const Mock = props => <Text accessibilityLabel={props.name}>icon</Text>;
+  return Mock;
+});
+
 jest.mock('react-native-biometrics', () => ({
   __esModule: true,
   default: class {

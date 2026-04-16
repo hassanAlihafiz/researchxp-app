@@ -1,62 +1,83 @@
-import React from 'react';
-import { Text } from 'react-native';
+import React, { useMemo } from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { DrawerMenuButton } from './DrawerMenuButton';
 import type { MainTabParamList } from './types';
 import HomeScreen from '../screens/dashboard/HomeScreen';
-import ExploreScreen from '../screens/dashboard/ExploreScreen';
-import ActivityScreen from '../screens/dashboard/ActivityScreen';
+import RewardsScreen from '../screens/dashboard/RewardsScreen';
+import ProfileScreen from '../screens/dashboard/ProfileScreen';
+import { useAppTheme } from '../theme/ThemeContext';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
+const TAB_ICON_SIZE = 24;
+
 export function MainTabNavigator() {
+  const { colors } = useAppTheme();
+
+  const screenOptions = useMemo(
+    () => ({
+      headerShown: true,
+      headerStyle: { backgroundColor: colors.background },
+      headerTintColor: colors.text,
+      headerTitleStyle: { fontWeight: '600' as const, color: colors.text },
+      headerShadowVisible: false,
+      headerTitleAlign: 'center' as const,
+      headerLeft: () => <DrawerMenuButton />,
+      tabBarStyle: {
+        backgroundColor: colors.tabBar,
+        borderTopColor: colors.tabBarBorder,
+      },
+      tabBarActiveTintColor: colors.primary,
+      tabBarInactiveTintColor: colors.textMuted,
+      tabBarLabelStyle: { fontSize: 12, fontWeight: '600' as const },
+    }),
+    [colors],
+  );
+
   return (
-    <Tab.Navigator
-      screenOptions={{
-        headerShown: true,
-        headerStyle: { backgroundColor: '#0b0f14' },
-        headerTintColor: '#f2f4f7',
-        headerTitleStyle: { fontWeight: '600', color: '#f2f4f7' },
-        headerShadowVisible: false,
-        headerTitleAlign: 'center',
-        headerLeft: () => <DrawerMenuButton />,
-        tabBarStyle: {
-          backgroundColor: '#121822',
-          borderTopColor: '#2a3441',
-        },
-        tabBarActiveTintColor: '#3b82f6',
-        tabBarInactiveTintColor: '#6b7788',
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
-      }}>
+    <Tab.Navigator screenOptions={screenOptions}>
       <Tab.Screen
         name="Home"
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 18 }}>⌂</Text>
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'home' : 'home-outline'}
+              size={TAB_ICON_SIZE}
+              color={color}
+            />
           ),
         }}
       />
       <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
+        name="Rewards"
+        component={RewardsScreen}
         options={{
-          title: 'Explore',
-          tabBarLabel: 'Explore',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 16 }}>◎</Text>
+          title: 'Rewards',
+          tabBarLabel: 'Rewards',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'gift' : 'gift-outline'}
+              size={TAB_ICON_SIZE}
+              color={color}
+            />
           ),
         }}
       />
       <Tab.Screen
-        name="Activity"
-        component={ActivityScreen}
+        name="Profile"
+        component={ProfileScreen}
         options={{
-          title: 'Activity',
-          tabBarLabel: 'Activity',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color, fontSize: 16 }}>◇</Text>
+          title: 'Profile',
+          tabBarLabel: 'Profile',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? 'person' : 'person-outline'}
+              size={TAB_ICON_SIZE}
+              color={color}
+            />
           ),
         }}
       />

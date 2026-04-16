@@ -1,29 +1,29 @@
 import React from 'react';
-import {
-  createDrawerNavigator,
-  DrawerToggleButton,
-} from '@react-navigation/drawer';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import type { MainDrawerParamList } from './types';
+import { DrawerMenuButton } from './DrawerMenuButton';
 import { MainTabNavigator } from './MainTabNavigator';
 import HelpScreen from '../screens/dashboard/HelpScreen';
 import SettingsScreen from '../screens/dashboard/SettingsScreen';
-
+import { useAppTheme } from '../theme/ThemeContext';
 
 const Drawer = createDrawerNavigator<MainDrawerParamList>();
 
 export function MainDrawerNavigator() {
+  const { colors } = useAppTheme();
+
   return (
     <Drawer.Navigator
       screenOptions={({ route }) => ({
         headerShown: route.name !== 'Tabs',
-        headerStyle: { backgroundColor: '#0b0f14' },
-        headerTintColor: '#f2f4f7',
-        headerTitleStyle: { fontWeight: '600' },
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontWeight: '600', color: colors.text },
         headerShadowVisible: false,
-        headerLeft: () => <DrawerToggleButton tintColor="#f2f4f7" />,
-        drawerStyle: { backgroundColor: '#121822' },
-        drawerActiveTintColor: '#3b82f6',
-        drawerInactiveTintColor: '#9aa4b2',
+        headerLeft: () => <DrawerMenuButton />,
+        drawerStyle: { backgroundColor: colors.drawerBackground },
+        drawerActiveTintColor: colors.primary,
+        drawerInactiveTintColor: colors.textSecondary,
         drawerLabelStyle: { fontWeight: '600' },
         drawerType: 'front',
       })}>

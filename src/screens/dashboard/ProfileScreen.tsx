@@ -2,13 +2,15 @@ import React, { useMemo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
+import { useAuth } from '../../auth/AuthContext';
 import type { MainTabParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
-type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
+type Props = BottomTabScreenProps<MainTabParamList, 'Profile'>;
 
-export default function HomeScreen(_props: Props) {
+export default function ProfileScreen(_props: Props) {
   const insets = useSafeAreaInsets();
+  const { email } = useAuth();
   const { colors } = useAppTheme();
 
   const styles = useMemo(
@@ -20,21 +22,26 @@ export default function HomeScreen(_props: Props) {
           backgroundColor: colors.background,
         },
         title: {
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: '700',
           color: colors.text,
-          marginBottom: 12,
+          marginBottom: 16,
+        },
+        label: {
+          fontSize: 13,
+          fontWeight: '600',
+          color: colors.textMuted,
+          marginBottom: 4,
+        },
+        email: {
+          fontSize: 16,
+          color: colors.text,
+          marginBottom: 24,
         },
         body: {
           fontSize: 15,
           color: colors.textSecondary,
           lineHeight: 22,
-          marginBottom: 20,
-        },
-        hint: {
-          fontSize: 14,
-          color: colors.textMuted,
-          lineHeight: 21,
         },
       }),
     [colors],
@@ -42,14 +49,12 @@ export default function HomeScreen(_props: Props) {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
-      <Text style={styles.title}>Home</Text>
+      <Text style={styles.title}>Profile</Text>
+      <Text style={styles.label}>Signed in as</Text>
+      <Text style={styles.email}>{email}</Text>
       <Text style={styles.body}>
-        Surveys you are matched with will appear here so you can conduct them in
-        the field. Use the Rewards and Profile tabs for incentives and your
-        account.
-      </Text>
-      <Text style={styles.hint}>
-        Tap ☰ in the header to open Settings and Help.
+        Account details and preferences will live here. Use ☰ in the header for
+        Settings and Help.
       </Text>
     </View>
   );

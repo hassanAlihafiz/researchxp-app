@@ -4,33 +4,44 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/auth/AuthContext';
 import { RootNavigator } from './src/navigation/RootNavigator';
+import { ThemeProvider, useAppTheme } from './src/theme/ThemeContext';
 
-const statusBarColor = '#0b0f14';
+function ThemedAppShell() {
+  const { colors, colorScheme } = useAppTheme();
+
+  return (
+    <View style={[styles.root, { backgroundColor: colors.background }]}>
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colors.background}
+        translucent={false}
+        animated
+      />
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </View>
+  );
+}
 
 function App() {
   return (
-    <GestureHandlerRootView style={styles.root}>
-      <SafeAreaProvider style={styles.root}>
-        <View style={styles.root}>
-          <StatusBar
-            barStyle="light-content"
-            backgroundColor={statusBarColor}
-            translucent={false}
-            animated
-          />
-          <AuthProvider>
-            <RootNavigator />
-          </AuthProvider>
-        </View>
+    <GestureHandlerRootView style={styles.flex}>
+      <SafeAreaProvider style={styles.flex}>
+        <ThemeProvider>
+          <ThemedAppShell />
+        </ThemeProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: {
+    flex: 1,
+  },
   root: {
     flex: 1,
-    backgroundColor: statusBarColor,
   },
 });
 

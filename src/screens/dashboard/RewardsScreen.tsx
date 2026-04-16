@@ -5,9 +5,9 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
-type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
+type Props = BottomTabScreenProps<MainTabParamList, 'Rewards'>;
 
-export default function HomeScreen(_props: Props) {
+export default function RewardsScreen(_props: Props) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
 
@@ -20,21 +20,15 @@ export default function HomeScreen(_props: Props) {
           backgroundColor: colors.background,
         },
         title: {
-          fontSize: 24,
+          fontSize: 22,
           fontWeight: '700',
           color: colors.text,
-          marginBottom: 12,
+          marginBottom: 8,
         },
         body: {
           fontSize: 15,
           color: colors.textSecondary,
           lineHeight: 22,
-          marginBottom: 20,
-        },
-        hint: {
-          fontSize: 14,
-          color: colors.textMuted,
-          lineHeight: 21,
         },
       }),
     [colors],
@@ -42,14 +36,10 @@ export default function HomeScreen(_props: Props) {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
-      <Text style={styles.title}>Home</Text>
+      <Text style={styles.title}>Rewards</Text>
       <Text style={styles.body}>
-        Surveys you are matched with will appear here so you can conduct them in
-        the field. Use the Rewards and Profile tabs for incentives and your
-        account.
-      </Text>
-      <Text style={styles.hint}>
-        Tap ☰ in the header to open Settings and Help.
+        Track points and incentives you earn from completed surveys. This section
+        will be wired up as your rewards program is defined.
       </Text>
     </View>
   );
