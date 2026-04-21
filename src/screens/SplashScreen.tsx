@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import {
   ActivityIndicator,
   Animated,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -28,6 +29,9 @@ export default function SplashScreen({ navigation }: Props) {
         root: {
           flex: 1,
           backgroundColor: colors.background,
+        },
+        contentContainer: {
+          flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center',
         },
@@ -85,7 +89,13 @@ export default function SplashScreen({ navigation }: Props) {
   }, [isSignedIn, navigation]);
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={[
+        styles.contentContainer,
+        { paddingTop: insets.top, paddingBottom: insets.bottom + 16 },
+      ]}
+      showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.content, { opacity }]}>
         <View style={styles.titleRow}>
           <Text style={styles.mark}>ResearchXP</Text>
@@ -98,6 +108,6 @@ export default function SplashScreen({ navigation }: Props) {
           size="large"
         />
       </Animated.View>
-    </View>
+    </ScrollView>
   );
 }

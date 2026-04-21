@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../theme/ThemeContext';
 
@@ -31,11 +31,17 @@ export default function HelpScreen() {
   );
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 24,
+      }}
+      showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Help</Text>
       <Text style={styles.body}>
         Add support links, FAQs, or contact options here.
       </Text>
-    </View>
+    </ScrollView>
   );
 }
