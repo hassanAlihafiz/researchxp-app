@@ -6,6 +6,7 @@ import type { MainTabParamList } from './types';
 import HomeScreen from '../screens/dashboard/HomeScreen';
 import RewardsScreen from '../screens/dashboard/RewardsScreen';
 import ProfileScreen from '../screens/dashboard/ProfileScreen';
+import { dashboardHeaderTitleStyle } from '../theme/dashboardStyles';
 import { useAppTheme } from '../theme/ThemeContext';
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -20,7 +21,7 @@ export function MainTabNavigator() {
       headerShown: true,
       headerStyle: { backgroundColor: colors.background },
       headerTintColor: colors.text,
-      headerTitleStyle: { fontWeight: '600' as const, color: colors.text },
+      headerTitleStyle: dashboardHeaderTitleStyle(colors),
       headerShadowVisible: false,
       headerTitleAlign: 'center' as const,
       headerLeft: () => <DrawerMenuButton />,
