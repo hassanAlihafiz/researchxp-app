@@ -1,9 +1,10 @@
 import React, { useMemo } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../auth/AuthContext';
 import type { MainTabParamList } from '../../navigation/types';
+import { createDashboardStyles } from '../../theme/dashboardStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Profile'>;
@@ -12,55 +13,32 @@ export default function ProfileScreen(_props: Props) {
   const insets = useSafeAreaInsets();
   const { email } = useAuth();
   const { colors } = useAppTheme();
-
-  const styles = useMemo(
-    () =>
-      StyleSheet.create({
-        root: {
-          flex: 1,
-          paddingHorizontal: 24,
-          backgroundColor: colors.background,
-        },
-        title: {
-          fontSize: 22,
-          fontWeight: '700',
-          color: colors.text,
-          marginBottom: 16,
-        },
-        label: {
-          fontSize: 13,
-          fontWeight: '600',
-          color: colors.textMuted,
-          marginBottom: 4,
-        },
-        email: {
-          fontSize: 16,
-          color: colors.text,
-          marginBottom: 24,
-        },
-        body: {
-          fontWeight: '800',
-          fontSize: 15,
-          color: colors.text,
-          lineHeight: 22,
-        },
-      }),
-    [colors],
-  );
+  const styles = useMemo(() => createDashboardStyles(colors), [colors]);
 
   return (
     <ScrollView
       style={styles.root}
       contentContainerStyle={{
         paddingTop: insets.top + 16,
-        paddingBottom: insets.bottom + 24,
+        paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>Profile</Text>
-      <Text style={styles.label}>Email</Text>
-      <Text style={styles.email}>{email}</Text>
-      <Text style={styles.body}>
-        Account details and preferences will live here.
+      <Text style={styles.screenTitle}>Profile</Text>
+      <Text style={styles.screenLead}>
+        Your participant identity and preferences will appear here as the app
+        connects to your ResearchXP account.
+      </Text>
+
+      <Text style={styles.overline}>Account</Text>
+      <View style={styles.elevatedBlock}>
+        <Text style={styles.fieldLabel}>Email</Text>
+        <Text style={styles.fieldValue}>{email ?? '—'}</Text>
+      </View>
+
+      <Text style={styles.sectionHeading}>Coming soon</Text>
+      <Text style={styles.paragraphLast}>
+        Demographics, notification settings, and verification status will live
+        in this section once wired to the backend.
       </Text>
     </ScrollView>
   );

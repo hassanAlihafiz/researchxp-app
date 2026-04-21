@@ -5,6 +5,7 @@ import { DrawerMenuButton } from './DrawerMenuButton';
 import { MainTabNavigator } from './MainTabNavigator';
 import HelpScreen from '../screens/dashboard/HelpScreen';
 import SettingsScreen from '../screens/dashboard/SettingsScreen';
+import { dashboardHeaderTitleStyle } from '../theme/dashboardStyles';
 import { useAppTheme } from '../theme/ThemeContext';
 
 const Drawer = createDrawerNavigator<MainDrawerParamList>();
@@ -18,7 +19,7 @@ export function MainDrawerNavigator() {
         headerShown: route.name !== 'Tabs',
         headerStyle: { backgroundColor: colors.background },
         headerTintColor: colors.text,
-        headerTitleStyle: { fontWeight: '600', color: colors.text },
+        headerTitleStyle: dashboardHeaderTitleStyle(colors),
         headerShadowVisible: false,
         headerLeft: () => <DrawerMenuButton />,
         drawerStyle: { backgroundColor: colors.drawerBackground },
