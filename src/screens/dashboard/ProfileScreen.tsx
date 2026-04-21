@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../auth/AuthContext';
@@ -39,8 +39,9 @@ export default function ProfileScreen(_props: Props) {
           marginBottom: 24,
         },
         body: {
+          fontWeight: '800',
           fontSize: 15,
-          color: colors.textSecondary,
+          color: colors.text,
           lineHeight: 22,
         },
       }),
@@ -48,14 +49,19 @@ export default function ProfileScreen(_props: Props) {
   );
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 24,
+      }}
+      showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Profile</Text>
-      <Text style={styles.label}>Signed in as</Text>
+      <Text style={styles.label}>Email</Text>
       <Text style={styles.email}>{email}</Text>
       <Text style={styles.body}>
-        Account details and preferences will live here. Use ☰ in the header for
-        Settings and Help.
+        Account details and preferences will live here.
       </Text>
-    </View>
+    </ScrollView>
   );
 }

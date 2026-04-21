@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -105,49 +106,54 @@ const LoginScreen = ({ navigation }: Props) => {
     <KeyboardAvoidingView
       style={[styles.root, { paddingTop: insets.top + 24 }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <Text style={styles.title}>Sign in</Text>
-      <Text style={styles.subtitle}>
-        Sign in with your ResearchXP account.
-      </Text>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
+        showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>Sign in</Text>
+        <Text style={styles.subtitle}>
+          Sign in with your ResearchXP account.
+        </Text>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Email</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          placeholder="you@company.com"
-          placeholderTextColor={colors.placeholder}
-          editable={!loading}
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Email</Text>
+          <TextInput
+            style={styles.input}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            placeholder="you@company.com"
+            placeholderTextColor={colors.placeholder}
+            editable={!loading}
+          />
+        </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          placeholder="••••••••"
-          placeholderTextColor={colors.placeholder}
-          editable={!loading}
-        />
-      </View>
+        <View style={styles.field}>
+          <Text style={styles.label}>Password</Text>
+          <TextInput
+            style={styles.input}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            placeholder="••••••••"
+            placeholderTextColor={colors.placeholder}
+            editable={!loading}
+          />
+        </View>
 
-      <Pressable
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={onSubmit}
-        disabled={loading}>
-        {loading ? (
-          <ActivityIndicator color={colors.onPrimary} />
-        ) : (
-          <Text style={styles.buttonText}>Continue</Text>
-        )}
-      </Pressable>
+        <Pressable
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={onSubmit}
+          disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color={colors.onPrimary} />
+          ) : (
+            <Text style={styles.buttonText}>Continue</Text>
+          )}
+        </Pressable>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };

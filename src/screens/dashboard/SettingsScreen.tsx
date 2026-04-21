@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DrawerScreenProps } from '@react-navigation/drawer';
 import { useAuth } from '../../auth/AuthContext';
@@ -39,7 +39,9 @@ export default function SettingsScreen(_props: Props) {
         },
         themeRow: {
           flexDirection: 'row',
-          gap: 10,
+          flexWrap: 'wrap',
+          columnGap: 10,
+          rowGap: 10,
           marginBottom: 28,
         },
         themeChip: {
@@ -101,7 +103,13 @@ export default function SettingsScreen(_props: Props) {
   };
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top + 16 }]}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={{
+        paddingTop: insets.top + 16,
+        paddingBottom: insets.bottom + 24,
+      }}
+      showsVerticalScrollIndicator={false}>
       <Text style={styles.title}>Settings</Text>
 
       <Text style={styles.sectionLabel}>Appearance</Text>
@@ -141,6 +149,6 @@ export default function SettingsScreen(_props: Props) {
       <Pressable style={styles.button} onPress={onSignOut}>
         <Text style={styles.buttonText}>Sign out</Text>
       </Pressable>
-    </View>
+    </ScrollView>
   );
 }
