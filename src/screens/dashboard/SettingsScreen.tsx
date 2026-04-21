@@ -17,8 +17,8 @@ export default function SettingsScreen(_props: Props) {
   const { colors, colorScheme, setColorScheme } = useAppTheme();
   const styles = useMemo(() => createDashboardStyles(colors), [colors]);
 
-  const onSignOut = () => {
-    signOut();
+  const onSignOut = async () => {
+    await signOut();
     resetToLogin();
   };
 

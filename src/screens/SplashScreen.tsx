@@ -19,7 +19,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export default function SplashScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { isSignedIn } = useAuth();
+  const { isSignedIn, ready } = useAuth();
   const { colors } = useAppTheme();
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -64,6 +64,9 @@ export default function SplashScreen({ navigation }: Props) {
   }, [opacity]);
 
   useEffect(() => {
+    if (!ready) {
+      return undefined;
+    }
     const id = setTimeout(() => {
       if (isSignedIn) {
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
@@ -72,7 +75,7 @@ export default function SplashScreen({ navigation }: Props) {
       }
     }, MIN_DISPLAY_MS);
     return () => clearTimeout(id);
-  }, [isSignedIn, navigation]);
+  }, [ready, isSignedIn, navigation]);
 
   return (
     <ScrollView

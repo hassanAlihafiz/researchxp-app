@@ -15,6 +15,8 @@ export type RegisteredAppUser = {
   id: string | number;
   name: string;
   email: string;
+  /** Present once DB migration `003_app_users_verification` is applied. */
+  verified?: boolean;
   date_of_birth: string | null;
   education: string | null;
   skills: unknown;
