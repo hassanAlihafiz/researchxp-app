@@ -5,11 +5,11 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  View,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
+import { ResearchLogo } from '../components/ResearchLogo';
 import type { RootStackParamList } from '../navigation/types';
 import { useAppTheme } from '../theme/ThemeContext';
 
@@ -39,22 +39,8 @@ export default function SplashScreen({ navigation }: Props) {
           alignItems: 'center',
           paddingHorizontal: 32,
         },
-        titleRow: {
-          flexDirection: 'column',
-          alignItems: 'center',
-          marginBottom: 12,
-        },
-        mark: {
-          fontSize: 40,
-          fontWeight: '800',
-          color: colors.text,
-          letterSpacing: -0.5,
-        },
-        markAccent: {
-          fontSize: 40,
-          fontWeight: '800',
-          color: colors.primary,
-          letterSpacing: -0.5,
+        logo: {
+          marginBottom: 20,
         },
         tagline: {
           fontSize: 16,
@@ -97,10 +83,7 @@ export default function SplashScreen({ navigation }: Props) {
       ]}
       showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.content, { opacity }]}>
-        <View style={styles.titleRow}>
-          <Text style={styles.mark}>ResearchXP</Text>
-          <Text style={styles.markAccent}>AI</Text>
-        </View>
+        <ResearchLogo width={280} containerStyle={styles.logo} />
         <Text style={styles.tagline}>Field research, simplified.</Text>
         <ActivityIndicator
           style={styles.spinner}
