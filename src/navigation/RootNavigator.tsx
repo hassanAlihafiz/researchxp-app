@@ -5,6 +5,7 @@ import type { RootStackParamList } from './types';
 import { navigationRef } from './navigationRef';
 import { MainDrawerNavigator } from './MainDrawerNavigator';
 import LoginScreen from '../screens/auth/LoginScreen';
+import RegisterScreen from '../screens/auth/RegisterScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { useAppTheme } from '../theme/ThemeContext';
 
@@ -35,6 +36,11 @@ export function RootNavigator() {
         <Stack.Screen
           name="Login"
           component={LoginScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="Register"
+          component={RegisterScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
