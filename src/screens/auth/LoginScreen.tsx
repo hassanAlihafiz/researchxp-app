@@ -2,29 +2,26 @@ import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  KeyboardAvoidingView,
   Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
-import { ResearchLogo } from '../../components/ResearchLogo';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { loginWithPassword, resendVerificationEmail } from '../../api/auth';
 import { useAuth } from '../../auth/AuthContext';
-import { loginWithPassword } from '../../auth/mockAuth';
+import { AuthScreenShell } from '../../components/AuthScreenShell';
+import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
 const LoginScreen = ({ navigation }: Props) => {
-  const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-  const { signIn } = useAuth();
+  const { signInWithSession } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -32,17 +29,10 @@ const LoginScreen = ({ navigation }: Props) => {
   const styles = useMemo(
     () =>
       StyleSheet.create({
-        root: {
-          flex: 1,
-          paddingHorizontal: 24,
-          backgroundColor: colors.background,
-        },
-        logo: {
-          marginBottom: 8,
-        },
         title: {
           fontSize: 28,
-          fontWeight: '700',
+          fontWeight: '800',
+          letterSpacing: -0.5,
           color: colors.text,
           marginBottom: 8,
         },
@@ -50,7 +40,7 @@ const LoginScreen = ({ navigation }: Props) => {
           fontSize: 15,
           color: colors.textSecondary,
           lineHeight: 22,
-          marginBottom: 28,
+          marginBottom: 26,
         },
         field: {
           marginBottom: 18,
@@ -64,7 +54,7 @@ const LoginScreen = ({ navigation }: Props) => {
         input: {
           borderWidth: 1,
           borderColor: colors.inputBorder,
-          borderRadius: 10,
+          borderRadius: 12,
           paddingHorizontal: 14,
           paddingVertical: Platform.OS === 'ios' ? 14 : 10,
           fontSize: 16,
@@ -72,9 +62,9 @@ const LoginScreen = ({ navigation }: Props) => {
           backgroundColor: colors.inputBackground,
         },
         button: {
-          marginTop: 8,
+          marginTop: 10,
           backgroundColor: colors.primary,
-          borderRadius: 10,
+          borderRadius: 12,
           paddingVertical: 16,
           alignItems: 'center',
         },
@@ -87,8 +77,9 @@ const LoginScreen = ({ navigation }: Props) => {
           fontWeight: '600',
         },
         footer: {
-          marginTop: 24,
+          marginTop: 28,
           alignItems: 'center',
+          paddingBottom: 4,
         },
         footerText: {
           fontSize: 15,
@@ -104,86 +95,101 @@ const LoginScreen = ({ navigation }: Props) => {
     [colors],
   );
 
+  const goToVerify = (addr: string) => {
+    navigation.navigate('VerifyEmail', { email: addr });
+  };
+
   const onSubmit = async () => {
     setLoading(true);
     try {
       const result = await loginWithPassword(email, password);
-      if (!result.ok) {
-        Alert.alert('Sign in failed', result.message);
+      if (result.ok) {
+        const addr = result.user.email.trim().toLowerCase();
+        await signInWithSession({
+          email: addr,
+          token: result.token,
+          user: result.user,
+        });
+        navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         return;
       }
-      const trimmed = email.trim().toLowerCase();
-      signIn(trimmed);
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+
+      if (result.needsVerification) {
+        const trimmed = email.trim().toLowerCase();
+        const resend = await resendVerificationEmail(trimmed);
+        if (!resend.ok) {
+          Alert.alert(
+            'Email not verified',
+            `We could not send a new code: ${resend.message}. You can try “Resend code” on the next screen.`,
+            [{ text: 'OK', onPress: () => goToVerify(trimmed) }],
+          );
+          return;
+        }
+        goToVerify(trimmed);
+        return;
+      }
+
+      Alert.alert('Sign in failed', result.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.root, { paddingTop: insets.top + 24 }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 24 }}
-        showsVerticalScrollIndicator={false}>
-        <ResearchLogo width={220} containerStyle={styles.logo} />
-        <Text style={styles.title}>Sign in</Text>
-        <Text style={styles.subtitle}>
-          Sign in with your ResearchXP account.
-        </Text>
+    <AuthScreenShell logoWidth={220}>
+      <Text style={styles.title}>Sign in</Text>
+      <Text style={styles.subtitle}>
+        Sign in with your ResearchXP account. You must verify your email before
+        you can use the app.
+      </Text>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Email</Text>
-          <TextInput
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            autoCorrect={false}
-            keyboardType="email-address"
-            placeholder="you@company.com"
-            placeholderTextColor={colors.placeholder}
-            editable={!loading}
-          />
-        </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          autoCorrect={false}
+          keyboardType="email-address"
+          placeholder="you@company.com"
+          placeholderTextColor={colors.placeholder}
+          editable={!loading}
+        />
+      </View>
 
-        <View style={styles.field}>
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-            placeholder="••••••••"
-            placeholderTextColor={colors.placeholder}
-            editable={!loading}
-          />
-        </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>Password</Text>
+        <PasswordField
+          value={password}
+          onChangeText={setPassword}
+          placeholder="••••••••"
+          colors={colors}
+          editable={!loading}
+        />
+      </View>
 
+      <Pressable
+        style={[styles.button, loading && styles.buttonDisabled]}
+        onPress={onSubmit}
+        disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color={colors.onPrimary} />
+        ) : (
+          <Text style={styles.buttonText}>Continue</Text>
+        )}
+      </Pressable>
+
+      <View style={styles.footer}>
+        <Text style={styles.footerText}>New to ResearchXP?</Text>
         <Pressable
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={onSubmit}
-          disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color={colors.onPrimary} />
-          ) : (
-            <Text style={styles.buttonText}>Continue</Text>
-          )}
+          onPress={() => navigation.navigate('Register')}
+          disabled={loading}
+          hitSlop={12}>
+          <Text style={styles.footerLink}>Create an account</Text>
         </Pressable>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>New to ResearchXP?</Text>
-          <Pressable
-            onPress={() => navigation.navigate('Register')}
-            disabled={loading}
-            hitSlop={12}>
-            <Text style={styles.footerLink}>Create an account</Text>
-          </Pressable>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+      </View>
+    </AuthScreenShell>
   );
 };
 

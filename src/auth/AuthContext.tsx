@@ -1,42 +1,164 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { fetchMyProfile } from '../api/memberProfile';
+import type { RegisteredAppUser } from '../api/registerMember';
+import { appLog, tokenPreview } from '../utils/appLog';
 import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
 } from 'react';
 
+const SESSION_KEY = '@researchxp/auth_session';
+
+export type AuthSession = {
+  email: string;
+  token: string;
+  /** Set when signing in from login / verify; omitted in older stored sessions. */
+  user?: RegisteredAppUser;
+};
+
+function userFromStorage(raw: unknown): RegisteredAppUser | null {
+  if (!raw || typeof raw !== 'object') {
+    return null;
+  }
+  const o = raw as Record<string, unknown>;
+  if (typeof o.email !== 'string' || typeof o.name !== 'string') {
+    return null;
+  }
+  return raw as RegisteredAppUser;
+}
+
 type AuthContextValue = {
   email: string | null;
+  token: string | null;
+  /** Profile from the last successful login or verify; null if not stored yet. */
+  user: RegisteredAppUser | null;
   isSignedIn: boolean;
-  signIn: (email: string) => void;
-  signOut: () => void;
+  /** Hydration finished (AsyncStorage read). */
+  ready: boolean;
+  signInWithSession: (session: AuthSession) => Promise<void>;
+  /**
+   * Persists the latest profile to memory and storage (e.g. after PATCH /me
+   * or a background profile fetch). Requires an active email + token.
+   */
+  updateSessionUser: (next: RegisteredAppUser) => Promise<void>;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<RegisteredAppUser | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [ready, setReady] = useState(false);
 
-  const signIn = useCallback((nextEmail: string) => {
-    setEmail(nextEmail);
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const raw = await AsyncStorage.getItem(SESSION_KEY);
+        if (!cancelled && raw) {
+          const parsed = JSON.parse(raw) as Partial<AuthSession>;
+          if (parsed?.email && parsed?.token) {
+            const profile = userFromStorage(parsed.user);
+            setEmail(parsed.email);
+            setToken(parsed.token);
+            setUser(profile);
+            setIsSignedIn(true);
+            appLog('auth', 'restored session from storage', {
+              email: parsed.email,
+              token: tokenPreview(parsed.token),
+              hasUserProfile: Boolean(profile),
+            });
+            if (!profile) {
+              void fetchMyProfile(parsed.token)
+                .then(fetched => {
+                  if (cancelled || !fetched) {
+                    return;
+                  }
+                  setUser(fetched);
+                  return AsyncStorage.setItem(
+                    SESSION_KEY,
+                    JSON.stringify({
+                      email: parsed.email,
+                      token: parsed.token,
+                      user: fetched,
+                    }),
+                  );
+                })
+                .catch(() => {
+                  /* offline or token expired */
+                });
+            }
+          } else {
+            appLog('auth', 'session JSON missing email or token');
+          }
+        } else if (!cancelled) {
+          appLog('auth', 'no session in storage (signed out or first launch)');
+        }
+      } catch {
+        /* ignore corrupt storage */
+      } finally {
+        if (!cancelled) {
+          setReady(true);
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const signInWithSession = useCallback(async (session: AuthSession) => {
+    appLog('auth', 'signInWithSession', {
+      email: session.email,
+      token: tokenPreview(session.token),
+    });
+    await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    setEmail(session.email);
+    setToken(session.token);
+    setUser(session.user ?? null);
     setIsSignedIn(true);
   }, []);
 
-  const signOut = useCallback(() => {
+  const updateSessionUser = useCallback(
+    async (next: RegisteredAppUser) => {
+      if (!email || !token) {
+        return;
+      }
+      setUser(next);
+      const session: AuthSession = { email, token, user: next };
+      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    },
+    [email, token],
+  );
+
+  const signOut = useCallback(async () => {
+    appLog('auth', 'signOut (clearing session)');
+    await AsyncStorage.removeItem(SESSION_KEY);
     setEmail(null);
+    setToken(null);
+    setUser(null);
     setIsSignedIn(false);
   }, []);
 
   const value = useMemo(
     () => ({
       email,
+      token,
+      user,
       isSignedIn,
-      signIn,
+      ready,
+      signInWithSession,
+      updateSessionUser,
       signOut,
     }),
-    [email, isSignedIn, signIn, signOut],
+    [email, token, user, isSignedIn, ready, signInWithSession, updateSessionUser, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

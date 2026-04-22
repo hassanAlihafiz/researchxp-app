@@ -6,8 +6,10 @@ import { navigationRef } from './navigationRef';
 import { MainDrawerNavigator } from './MainDrawerNavigator';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
+import VerifyEmailScreen from '../screens/auth/VerifyEmailScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { useAppTheme } from '../theme/ThemeContext';
+import { appLog } from '../utils/appLog';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -26,7 +28,18 @@ export function RootNavigator() {
   );
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navigationTheme}>
+    <NavigationContainer
+      ref={navigationRef}
+      theme={navigationTheme}
+      onStateChange={() => {
+        if (navigationRef.isReady()) {
+          const r = navigationRef.getCurrentRoute();
+          if (r) {
+            appLog('nav', 'screen', { name: r.name, params: r.params });
+          }
+        }
+      }}
+    >
       <Stack.Navigator initialRouteName="Splash" screenOptions={screenOptions}>
         <Stack.Screen
           name="Splash"
@@ -41,6 +54,11 @@ export function RootNavigator() {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="VerifyEmail"
+          component={VerifyEmailScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
