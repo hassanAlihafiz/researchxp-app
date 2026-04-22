@@ -10,9 +10,10 @@ import {
   View,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { loginWithPassword } from '../../api/auth';
+import { loginWithPassword, resendVerificationEmail } from '../../api/auth';
 import { useAuth } from '../../auth/AuthContext';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
+import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
@@ -94,25 +95,41 @@ const LoginScreen = ({ navigation }: Props) => {
     [colors],
   );
 
+  const goToVerify = (addr: string) => {
+    navigation.navigate('VerifyEmail', { email: addr });
+  };
+
   const onSubmit = async () => {
     setLoading(true);
     try {
       const result = await loginWithPassword(email, password);
-      if (!result.ok) {
-        if (result.needsVerification) {
-          const trimmed = email.trim().toLowerCase();
-          navigation.navigate('VerifyEmail', { email: trimmed });
-          return;
-        }
-        Alert.alert('Sign in failed', result.message);
+      if (result.ok) {
+        const addr = result.user.email.trim().toLowerCase();
+        await signInWithSession({
+          email: addr,
+          token: result.token,
+          user: result.user,
+        });
+        navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
         return;
       }
-      const trimmed = email.trim().toLowerCase();
-      await signInWithSession({
-        email: trimmed,
-        token: result.token,
-      });
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+
+      if (result.needsVerification) {
+        const trimmed = email.trim().toLowerCase();
+        const resend = await resendVerificationEmail(trimmed);
+        if (!resend.ok) {
+          Alert.alert(
+            'Email not verified',
+            `We could not send a new code: ${resend.message}. You can try “Resend code” on the next screen.`,
+            [{ text: 'OK', onPress: () => goToVerify(trimmed) }],
+          );
+          return;
+        }
+        goToVerify(trimmed);
+        return;
+      }
+
+      Alert.alert('Sign in failed', result.message);
     } finally {
       setLoading(false);
     }
@@ -122,7 +139,8 @@ const LoginScreen = ({ navigation }: Props) => {
     <AuthScreenShell logoWidth={220}>
       <Text style={styles.title}>Sign in</Text>
       <Text style={styles.subtitle}>
-        Sign in with your ResearchXP account.
+        Sign in with your ResearchXP account. You must verify your email before
+        you can use the app.
       </Text>
 
       <View style={styles.field}>
@@ -142,13 +160,11 @@ const LoginScreen = ({ navigation }: Props) => {
 
       <View style={styles.field}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
+        <PasswordField
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
           placeholder="••••••••"
-          placeholderTextColor={colors.placeholder}
+          colors={colors}
           editable={!loading}
         />
       </View>

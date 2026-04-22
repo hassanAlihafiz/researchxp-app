@@ -12,21 +12,26 @@ import {
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { registerMember } from '../../api/registerMember';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
+import { DateOfBirthField } from '../../components/DateOfBirthField';
+import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
+import { toIsoDateString } from '../../utils/dateFormat';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DOB_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const MIN_DOB = new Date(1900, 0, 1);
 
 const RegisterScreen = ({ navigation }: Props) => {
-  const { colors } = useAppTheme();
+  const { colors, colorScheme } = useAppTheme();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [dob, setDob] = useState('');
+  /** `null` = user has not chosen a date (optional field). */
+  const [dobDate, setDobDate] = useState<Date | null>(null);
   const [education, setEducation] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -107,7 +112,7 @@ const RegisterScreen = ({ navigation }: Props) => {
   const onSubmit = async () => {
     const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
-    const trimmedDob = dob.trim();
+    const dobStr = dobDate ? toIsoDateString(dobDate) : '';
 
     if (!trimmedName) {
       Alert.alert('Missing name', 'Please enter your name.');
@@ -125,10 +130,6 @@ const RegisterScreen = ({ navigation }: Props) => {
       Alert.alert('Passwords do not match', 'Re-enter your password to confirm.');
       return;
     }
-    if (trimmedDob && !DOB_RE.test(trimmedDob)) {
-      Alert.alert('Invalid date', 'Use YYYY-MM-DD or leave date of birth empty.');
-      return;
-    }
 
     setLoading(true);
     try {
@@ -136,7 +137,7 @@ const RegisterScreen = ({ navigation }: Props) => {
         name: trimmedName,
         email: trimmedEmail,
         password,
-        dob: trimmedDob || null,
+        dob: dobStr || null,
         education: education.trim() || null,
       });
 
@@ -150,6 +151,8 @@ const RegisterScreen = ({ navigation }: Props) => {
       setLoading(false);
     }
   };
+
+  const maxDob = useMemo(() => new Date(), []);
 
   return (
     <AuthScreenShell logoWidth={220}>
@@ -188,44 +191,37 @@ const RegisterScreen = ({ navigation }: Props) => {
 
       <View style={styles.field}>
         <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
+        <PasswordField
           value={password}
           onChangeText={setPassword}
-          secureTextEntry
           placeholder="At least 8 characters"
-          placeholderTextColor={colors.placeholder}
+          colors={colors}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
         <Text style={styles.label}>Confirm password</Text>
-        <TextInput
-          style={styles.input}
+        <PasswordField
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry
           placeholder="••••••••"
-          placeholderTextColor={colors.placeholder}
+          colors={colors}
           editable={!loading}
         />
       </View>
 
-      <View style={styles.field}>
-        <Text style={styles.label}>Date of birth (optional)</Text>
-        <TextInput
-          style={styles.input}
-          value={dob}
-          onChangeText={setDob}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="YYYY-MM-DD"
-          placeholderTextColor={colors.placeholder}
-          editable={!loading}
-        />
-        <Text style={styles.hint}>Must match server format if provided.</Text>
-      </View>
+      <DateOfBirthField
+        value={dobDate}
+        onChange={setDobDate}
+        colors={colors}
+        colorScheme={colorScheme}
+        label="Date of birth (optional)"
+        hint="Used for your profile. You can leave this blank."
+        disabled={loading}
+        minDate={MIN_DOB}
+        maxDate={maxDob}
+      />
 
       <View style={styles.field}>
         <Text style={styles.label}>Education (optional)</Text>

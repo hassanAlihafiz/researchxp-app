@@ -1,5 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
+import { MainDrawerContent } from './MainDrawerContent';
 import type { MainDrawerParamList } from './types';
 import { DrawerMenuButton } from './DrawerMenuButton';
 import { MainTabNavigator } from './MainTabNavigator';
@@ -15,6 +16,7 @@ export function MainDrawerNavigator() {
 
   return (
     <Drawer.Navigator
+      drawerContent={props => <MainDrawerContent {...props} />}
       screenOptions={({ route }) => ({
         headerShown: route.name !== 'Tabs',
         headerStyle: { backgroundColor: colors.background },

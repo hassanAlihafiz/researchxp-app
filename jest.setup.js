@@ -28,6 +28,15 @@ jest.mock('react-native-vector-icons/Ionicons', () => {
   return Mock;
 });
 
+jest.mock('@react-native-community/datetimepicker', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  return {
+    __esModule: true,
+    default: () => <View testID="datetimepicker-mock" />,
+  };
+});
+
 jest.mock('react-native-biometrics', () => ({
   __esModule: true,
   default: class {

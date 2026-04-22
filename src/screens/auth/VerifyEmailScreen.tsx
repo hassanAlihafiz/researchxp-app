@@ -159,6 +159,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
       await signInWithSession({
         email: result.user.email.trim().toLowerCase(),
         token: result.token,
+        user: result.user,
       });
       navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
     } finally {
