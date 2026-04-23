@@ -8,10 +8,14 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
 const SESSION_KEY = '@researchxp/auth_session';
+
+/** Cleared on sign-out. Add keys here if we persist other member-specific data. */
+const USER_RELATED_ASYNC_STORAGE_KEYS = [SESSION_KEY] as const;
 
 export type AuthSession = {
   email: string;
@@ -56,6 +60,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<RegisteredAppUser | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [ready, setReady] = useState(false);
+  /** Prevents a slow initial profile fetch from writing after sign-out / account deletion. */
+  const activeTokenRef = useRef<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,6 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const parsed = JSON.parse(raw) as Partial<AuthSession>;
           if (parsed?.email && parsed?.token) {
             const profile = userFromStorage(parsed.user);
+            activeTokenRef.current = parsed.token;
             setEmail(parsed.email);
             setToken(parsed.token);
             setUser(profile);
@@ -76,9 +83,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               hasUserProfile: Boolean(profile),
             });
             if (!profile) {
+              const tokenAtFetchStart = parsed.token;
               void fetchMyProfile(parsed.token)
                 .then(fetched => {
                   if (cancelled || !fetched) {
+                    return;
+                  }
+                  if (activeTokenRef.current !== tokenAtFetchStart) {
+                    appLog('auth', 'ignored stale profile fetch (session cleared)');
                     return;
                   }
                   setUser(fetched);
@@ -119,6 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       email: session.email,
       token: tokenPreview(session.token),
     });
+    activeTokenRef.current = session.token;
     await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(session));
     setEmail(session.email);
     setToken(session.token);
@@ -139,8 +152,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
-    appLog('auth', 'signOut (clearing session)');
-    await AsyncStorage.removeItem(SESSION_KEY);
+    appLog('auth', 'signOut (clearing user session storage)');
+    activeTokenRef.current = null;
+    await AsyncStorage.removeMany([...USER_RELATED_ASYNC_STORAGE_KEYS]);
     setEmail(null);
     setToken(null);
     setUser(null);

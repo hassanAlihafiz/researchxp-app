@@ -102,3 +102,34 @@ export async function updateMyProfile(
     return { ok: false, message, status: 0 };
   }
 }
+
+/**
+ * Permanently deletes the signed-in account on the server (right to erasure).
+ */
+export async function deleteMyAccount(
+  token: string,
+): Promise<{ ok: true } | { ok: false; message: string; status: number }> {
+  appLog('api', 'DELETE /api/members/me', { token: tokenPreview(token) });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/members/me`, {
+      method: 'DELETE',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const obj = await readJson(res);
+    if (res.ok && obj && obj.ok === true) {
+      return { ok: true };
+    }
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status})`;
+    return { ok: false, message: errMsg, status: res.status };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection.';
+    return { ok: false, message, status: 0 };
+  }
+}
