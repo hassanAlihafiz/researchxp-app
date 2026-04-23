@@ -1,6 +1,10 @@
 import React, { useMemo } from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  type BottomTabBarButtonProps,
+} from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AppPressable } from '../components/AppPressable';
 import { DrawerMenuButton } from './DrawerMenuButton';
 import type { MainTabParamList } from './types';
 import HomeScreen from '../screens/dashboard/HomeScreen';
@@ -12,6 +16,10 @@ import { useAppTheme } from '../theme/ThemeContext';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const TAB_ICON_SIZE = 24;
+
+function TabBarButton(props: BottomTabBarButtonProps) {
+  return <AppPressable {...props} />;
+}
 
 export function MainTabNavigator() {
   const { colors } = useAppTheme();
@@ -32,6 +40,7 @@ export function MainTabNavigator() {
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: colors.textMuted,
       tabBarLabelStyle: { fontSize: 12, fontWeight: '500' as const },
+      tabBarButton: TabBarButton,
     }),
     [colors],
   );

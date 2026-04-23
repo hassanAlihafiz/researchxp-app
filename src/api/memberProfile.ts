@@ -103,6 +103,42 @@ export async function updateMyProfile(
   }
 }
 
+export async function updateMyPassword(
+  token: string,
+  body: { currentPassword: string; newPassword: string },
+): Promise<{ ok: true } | { ok: false; message: string; status: number }> {
+  appLog('api', 'PATCH /api/members/me/password (passwords omitted)', {
+    token: tokenPreview(token),
+  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/members/me/password`, {
+      method: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        currentPassword: body.currentPassword,
+        newPassword: body.newPassword,
+      }),
+    });
+    const obj = await readJson(res);
+    if (res.ok && obj && obj.ok === true) {
+      return { ok: true };
+    }
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status})`;
+    return { ok: false, message: errMsg, status: res.status };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection.';
+    return { ok: false, message, status: 0 };
+  }
+}
+
 /**
  * Permanently deletes the signed-in account on the server (right to erasure).
  */

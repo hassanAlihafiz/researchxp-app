@@ -126,6 +126,105 @@ export async function verifyEmailWithCode(
   }
 }
 
+export type ForgotPasswordRequestResult =
+  | { ok: true; message: string }
+  | { ok: false; message: string };
+
+export type ResetPasswordResult =
+  | { ok: true; message: string }
+  | { ok: false; message: string };
+
+export async function requestForgotPassword(email: string): Promise<ForgotPasswordRequestResult> {
+  const trimmed = email.trim().toLowerCase();
+  appLog('api', 'POST /api/auth/forgot-password', { email: trimmed });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: trimmed }),
+    });
+    const obj = await parseJsonResponse(res);
+    if (res.ok && obj?.ok === true && typeof obj.message === 'string') {
+      return { ok: true, message: obj.message };
+    }
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status}).`;
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
+    return { ok: false, message };
+  }
+}
+
+export async function resendForgotPasswordCode(email: string): Promise<ForgotPasswordRequestResult> {
+  const trimmed = email.trim().toLowerCase();
+  appLog('api', 'POST /api/auth/resend-reset-code', { email: trimmed });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/resend-reset-code`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: trimmed }),
+    });
+    const obj = await parseJsonResponse(res);
+    if (res.ok && obj?.ok === true && typeof obj.message === 'string') {
+      return { ok: true, message: obj.message };
+    }
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status}).`;
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
+    return { ok: false, message };
+  }
+}
+
+export async function resetPasswordWithCode(
+  email: string,
+  code: string,
+  password: string,
+): Promise<ResetPasswordResult> {
+  const trimmed = email.trim().toLowerCase();
+  const digits = code.replace(/\D/g, '');
+  appLog('api', 'POST /api/auth/reset-password', { email: trimmed, codeLength: digits.length });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/reset-password`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email: trimmed, code: digits, password }),
+    });
+    const obj = await parseJsonResponse(res);
+    if (res.ok && obj?.ok === true) {
+      const msg =
+        typeof obj.message === 'string' ? obj.message : 'Password updated. You can sign in.';
+      return { ok: true, message: msg };
+    }
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status}).`;
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
+    return { ok: false, message };
+  }
+}
+
 export async function resendVerificationEmail(email: string): Promise<ResendVerificationResult> {
   const trimmed = email.trim().toLowerCase();
   appLog('api', 'POST /api/members/resend-verification', { email: trimmed });

@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  KeyboardAvoidingView,
   Platform,
-  Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -11,10 +11,15 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import {
+  type BottomTabScreenProps,
+  useBottomTabBarHeight,
+} from '@react-navigation/bottom-tabs';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import { deleteMyAccount, fetchMyProfile, updateMyProfile } from '../../api/memberProfile';
 import { useAuth } from '../../auth/AuthContext';
+import { AppPressable } from '../../components/AppPressable';
 import { DateOfBirthField } from '../../components/DateOfBirthField';
 import { resetToLogin } from '../../navigation/navigationRef';
 import type { MainTabParamList } from '../../navigation/types';
@@ -81,6 +86,8 @@ function formatMemberSince(createdAt: string | undefined): string {
 
 export default function ProfileScreen(_props: Props) {
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
+  const tabBarHeight = useBottomTabBarHeight();
   const { email, user, token, updateSessionUser, signOut } = useAuth();
   const { colors, colorScheme } = useAppTheme();
   const baseStyles = useMemo(() => createDashboardStyles(colors), [colors]);
@@ -178,6 +185,10 @@ export default function ProfileScreen(_props: Props) {
           color: colors.textMuted,
           lineHeight: 20,
           marginTop: 10,
+        },
+        keyboardAvoidRoot: {
+          flex: 1,
+          backgroundColor: colors.background,
         },
       }),
     [colors],
@@ -344,7 +355,7 @@ export default function ProfileScreen(_props: Props) {
           You can delete your account at any time. We will remove your member
           profile and account data from our systems as described when you confirm.
         </Text>
-        <Pressable
+        <AppPressable
           style={[
             formStyles.deleteAccountButton,
             deletingAccount && formStyles.saveButtonDisabled,
@@ -358,7 +369,7 @@ export default function ProfileScreen(_props: Props) {
           ) : (
             <Text style={formStyles.deleteAccountText}>Delete account</Text>
           )}
-        </Pressable>
+        </AppPressable>
         <Text style={formStyles.deleteHint}>
           ResearchXP may retain anonymized or aggregated research records where
           the law allows and personal identifiers have been removed.
@@ -367,27 +378,39 @@ export default function ProfileScreen(_props: Props) {
     </>
   );
 
+  const scrollBottomPad =
+    insets.bottom +
+    tabBarHeight +
+    24 +
+    (isEditing ? 160 : 0);
+
   return (
-    <ScrollView
-      style={baseStyles.root}
-      contentContainerStyle={{
-        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
-        paddingBottom: insets.bottom + 28,
-      }}
-      showsVerticalScrollIndicator={false}
-      refreshControl={
-        <RefreshControl
-          refreshing={refreshing}
-          onRefresh={onRefresh}
-          enabled={Boolean(token)}
-          tintColor={colors.primary}
-        />
-      }>
+    <KeyboardAvoidingView
+      style={formStyles.keyboardAvoidRoot}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={headerHeight}>
+      <ScrollView
+        style={baseStyles.root}
+        contentContainerStyle={{
+          paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
+          paddingBottom: scrollBottomPad,
+        }}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            enabled={Boolean(token)}
+            tintColor={colors.primary}
+          />
+        }>
       <Text style={baseStyles.screenTitle}>Profile</Text>
-      <Text style={baseStyles.screenLead}>
+      {/* <Text style={baseStyles.screenLead}>
         Your ResearchXP account. Use Edit details to change your profile. Email
         is shown for reference and cannot be changed in the app.
-      </Text>
+      </Text> */}
 
       <Text style={baseStyles.overline}>Account</Text>
       <View style={baseStyles.elevatedBlock}>
@@ -442,13 +465,13 @@ export default function ProfileScreen(_props: Props) {
             </Text>
           </View>
           {canEdit ? (
-            <Pressable
+            <AppPressable
               style={formStyles.editDetailsButton}
               onPress={onPressEdit}
               accessibilityRole="button"
               accessibilityLabel="Edit profile details">
               <Text style={formStyles.editDetailsText}>Edit details</Text>
-            </Pressable>
+            </AppPressable>
           ) : null}
           {token ? dataPrivacyContent : null}
         </>
@@ -528,15 +551,15 @@ export default function ProfileScreen(_props: Props) {
           </View>
 
           <View style={formStyles.buttonRow}>
-            <Pressable
+            <AppPressable
               style={formStyles.cancelButton}
               onPress={onPressCancel}
               disabled={saving}
               accessibilityRole="button"
               accessibilityLabel="Cancel editing">
               <Text style={formStyles.cancelText}>Cancel</Text>
-            </Pressable>
-            <Pressable
+            </AppPressable>
+            <AppPressable
               style={[
                 formStyles.saveButton,
                 (!canEdit || saving) && formStyles.saveButtonDisabled,
@@ -550,7 +573,7 @@ export default function ProfileScreen(_props: Props) {
               ) : (
                 <Text style={formStyles.saveText}>Save</Text>
               )}
-            </Pressable>
+            </AppPressable>
           </View>
         </>
       ) : null}
@@ -562,6 +585,7 @@ export default function ProfileScreen(_props: Props) {
             : 'Your saved session has no profile. Sign in again to load and edit your profile.'}
         </Text>
       ) : null}
-    </ScrollView>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }

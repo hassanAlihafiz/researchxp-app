@@ -3,12 +3,12 @@ import React, { useCallback, useMemo, useState } from 'react';
 import {
   Modal,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { AppPressable } from './AppPressable';
 import type { AppPalette, ColorScheme } from '../theme/palettes';
 import { formatDateDisplay } from '../utils/dateFormat';
 
@@ -142,7 +142,7 @@ export function DateOfBirthField({
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.dobRow}>
-        <Pressable
+        <AppPressable
           style={styles.dobPress}
           onPress={openPicker}
           disabled={disabled}
@@ -154,16 +154,16 @@ export function DateOfBirthField({
               ? formatDateDisplay(value)
               : 'Tap to choose a date'}
           </Text>
-        </Pressable>
+        </AppPressable>
         {showClear && value ? (
-          <Pressable
+          <AppPressable
             style={styles.clearDob}
             onPress={() => onChange(null)}
             hitSlop={8}
             disabled={disabled}
             accessibilityLabel="Clear date of birth">
             <Text style={styles.clearDobText}>Clear</Text>
-          </Pressable>
+          </AppPressable>
         ) : null}
       </View>
       {hint ? <Text style={styles.hint}>{hint}</Text> : null}
@@ -187,7 +187,7 @@ export function DateOfBirthField({
           transparent
           onRequestClose={() => setOpen(false)}>
           <View style={{ flex: 1 }}>
-            <Pressable
+            <AppPressable
               style={[
                 StyleSheet.absoluteFill,
                 { backgroundColor: 'rgba(0,0,0,0.45)' },
@@ -207,19 +207,19 @@ export function DateOfBirthField({
                 },
               ]}>
               <View style={styles.modalBar}>
-                <Pressable onPress={() => setOpen(false)} hitSlop={12}>
+                <AppPressable onPress={() => setOpen(false)} hitSlop={12}>
                   <Text style={[styles.modalBtn, styles.modalCancel]}>
                     Cancel
                   </Text>
-                </Pressable>
+                </AppPressable>
                 <Text style={{ fontWeight: '700', color: colors.text }}>
                   Date of birth
                 </Text>
-                <Pressable onPress={confirmIos} hitSlop={12}>
+                <AppPressable onPress={confirmIos} hitSlop={12}>
                   <Text style={[styles.modalBtn, styles.modalDone]}>
                     Done
                   </Text>
-                </Pressable>
+                </AppPressable>
               </View>
               <View style={styles.iosPickerWrap}>
                 <DateTimePicker

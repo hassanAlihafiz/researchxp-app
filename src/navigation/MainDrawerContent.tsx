@@ -1,10 +1,5 @@
 import React, { useMemo } from 'react';
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import type { DrawerContentComponentProps } from '@react-navigation/drawer';
 import {
   DrawerContentScrollView,
@@ -12,6 +7,7 @@ import {
 } from '@react-navigation/drawer';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { AppPressable } from '../components/AppPressable';
 import { useAuth } from '../auth/AuthContext';
 import { resetToLogin } from './navigationRef';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -79,12 +75,7 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
       <View style={styles.footer}>
-        {email ? (
-          <Text style={styles.emailLine} numberOfLines={1}>
-            {email}
-          </Text>
-        ) : null}
-        <Pressable
+        <AppPressable
           style={({ pressed }) => [styles.signOutBtn, pressed && { opacity: 0.65 }]}
           onPress={onSignOut}
           accessibilityRole="button"
@@ -93,7 +84,7 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
             <Ionicons name="log-out-outline" size={22} color={colors.text} />
           </View>
           <Text style={styles.signOutLabel}>Sign out</Text>
-        </Pressable>
+        </AppPressable>
       </View>
     </View>
   );

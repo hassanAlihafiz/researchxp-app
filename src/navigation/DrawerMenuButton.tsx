@@ -1,8 +1,9 @@
 import React, { useCallback } from 'react';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import type { DrawerNavigationProp } from '@react-navigation/drawer';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import type { MainDrawerParamList } from './types';
+import { AppPressable } from '../components/AppPressable';
 import { useAppTheme } from '../theme/ThemeContext';
 
 /**
@@ -31,14 +32,14 @@ export function DrawerMenuButton() {
   }, [navigation]);
 
   return (
-    <Pressable
+    <AppPressable
       onPress={onPress}
       style={styles.wrap}
       hitSlop={12}
       accessibilityRole="button"
       accessibilityLabel="Open navigation menu">
       <Text style={[styles.icon, { color: colors.text }]}>☰</Text>
-    </Pressable>
+    </AppPressable>
   );
 }
 
