@@ -13,11 +13,15 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import { fetchMyProfile, updateMyProfile } from '../../api/memberProfile';
+import { deleteMyAccount, fetchMyProfile, updateMyProfile } from '../../api/memberProfile';
 import { useAuth } from '../../auth/AuthContext';
 import { DateOfBirthField } from '../../components/DateOfBirthField';
+import { resetToLogin } from '../../navigation/navigationRef';
 import type { MainTabParamList } from '../../navigation/types';
-import { createDashboardStyles } from '../../theme/dashboardStyles';
+import {
+  createDashboardStyles,
+  DASHBOARD_SCROLL_PADDING_TOP,
+} from '../../theme/dashboardStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 import {
   formatIsoDateStringForDisplay,
@@ -77,7 +81,7 @@ function formatMemberSince(createdAt: string | undefined): string {
 
 export default function ProfileScreen(_props: Props) {
   const insets = useSafeAreaInsets();
-  const { email, user, token, updateSessionUser } = useAuth();
+  const { email, user, token, updateSessionUser, signOut } = useAuth();
   const { colors, colorScheme } = useAppTheme();
   const baseStyles = useMemo(() => createDashboardStyles(colors), [colors]);
   const formStyles = useMemo(
@@ -154,6 +158,27 @@ export default function ProfileScreen(_props: Props) {
           marginBottom: 8,
         },
         hint: { fontSize: 12, color: colors.textMuted, marginTop: 6, marginBottom: 14 },
+        deleteSection: { marginTop: 8, marginBottom: 12 },
+        deleteAccountButton: {
+          marginTop: 4,
+          borderRadius: 12,
+          paddingVertical: 16,
+          alignItems: 'center',
+          borderWidth: 1,
+          borderColor: '#c62828',
+          backgroundColor: 'transparent',
+        },
+        deleteAccountText: {
+          fontSize: 16,
+          fontWeight: '600',
+          color: '#e53935',
+        },
+        deleteHint: {
+          fontSize: 13,
+          color: colors.textMuted,
+          lineHeight: 20,
+          marginTop: 10,
+        },
       }),
     [colors],
   );
@@ -166,6 +191,7 @@ export default function ProfileScreen(_props: Props) {
   const [saving, setSaving] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
   const maxDob = useMemo(() => new Date(), []);
 
   const hydrateFormFromUser = useCallback((u: RegisteredAppUser) => {
@@ -247,6 +273,56 @@ export default function ProfileScreen(_props: Props) {
     }
   };
 
+  const confirmDeleteAccount = useCallback(() => {
+    if (!token) {
+      Alert.alert('Not signed in', 'Sign in again to manage your account.');
+      return;
+    }
+    Alert.alert(
+      'Delete your account?',
+      'This permanently deletes your ResearchXP member account and profile data, including rewards balance and study assignment history tied to this account. This cannot be undone.\n\nIf you are in the EEA, UK, or California, this supports your right to erasure under GDPR and similar laws.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete account',
+          style: 'destructive',
+          onPress: () => {
+            Alert.alert(
+              'Are you sure?',
+              'Your account will be removed immediately.',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: async () => {
+                    setDeletingAccount(true);
+                    try {
+                      const result = await deleteMyAccount(token);
+                      if (!result.ok) {
+                        Alert.alert(
+                          'Could not delete account',
+                          result.status === 401
+                            ? 'Your session has expired. Sign in again, then try deleting your account.'
+                            : result.message,
+                        );
+                        return;
+                      }
+                      await signOut();
+                      resetToLogin();
+                    } finally {
+                      setDeletingAccount(false);
+                    }
+                  },
+                },
+              ],
+            );
+          },
+        },
+      ],
+    );
+  }, [token, signOut, resetToLogin]);
+
   const displayEmail = user?.email ?? email ?? '—';
   const verification =
     user == null
@@ -258,11 +334,44 @@ export default function ProfileScreen(_props: Props) {
   const canEdit = Boolean(user && token);
   const showLegacyHint = user == null && email;
 
+  const dataPrivacyContent = (
+    <>
+      <Text style={[baseStyles.overline, formStyles.deleteSection]}>
+        Data & privacy
+      </Text>
+      <View style={baseStyles.elevatedBlock}>
+        <Text style={baseStyles.paragraph}>
+          You can delete your account at any time. We will remove your member
+          profile and account data from our systems as described when you confirm.
+        </Text>
+        <Pressable
+          style={[
+            formStyles.deleteAccountButton,
+            deletingAccount && formStyles.saveButtonDisabled,
+          ]}
+          onPress={confirmDeleteAccount}
+          disabled={deletingAccount}
+          accessibilityRole="button"
+          accessibilityLabel="Delete account">
+          {deletingAccount ? (
+            <ActivityIndicator color="#e53935" />
+          ) : (
+            <Text style={formStyles.deleteAccountText}>Delete account</Text>
+          )}
+        </Pressable>
+        <Text style={formStyles.deleteHint}>
+          ResearchXP may retain anonymized or aggregated research records where
+          the law allows and personal identifiers have been removed.
+        </Text>
+      </View>
+    </>
+  );
+
   return (
     <ScrollView
       style={baseStyles.root}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}
@@ -305,6 +414,8 @@ export default function ProfileScreen(_props: Props) {
         </View>
       ) : null}
 
+      {token && !user ? dataPrivacyContent : null}
+
       {user && !isEditing ? (
         <>
           <Text style={baseStyles.overline}>Your details</Text>
@@ -339,6 +450,7 @@ export default function ProfileScreen(_props: Props) {
               <Text style={formStyles.editDetailsText}>Edit details</Text>
             </Pressable>
           ) : null}
+          {token ? dataPrivacyContent : null}
         </>
       ) : null}
 

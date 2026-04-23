@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
 import { ScrollView, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { createDashboardStyles } from '../../theme/dashboardStyles';
+import {
+  createDashboardStyles,
+  DASHBOARD_SCROLL_PADDING_TOP,
+} from '../../theme/dashboardStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function HelpScreen() {
@@ -13,7 +16,7 @@ export default function HelpScreen() {
     <ScrollView
       style={styles.root}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>

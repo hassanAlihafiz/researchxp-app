@@ -4,6 +4,13 @@ import type { AppPalette } from './palettes';
 const CARD_RADIUS = 16;
 
 /**
+ * Scroll content top padding under a React Navigation header. Do not add
+ * `useSafeAreaInsets().top` here — the header already sits below the status bar,
+ * so including the top inset again creates a large empty gap.
+ */
+export const DASHBOARD_SCROLL_PADDING_TOP = 12;
+
+/**
  * Shared typography and surfaces for tab + drawer screens (matches auth / brand).
  */
 export function createDashboardStyles(colors: AppPalette) {
@@ -16,9 +23,9 @@ export function createDashboardStyles(colors: AppPalette) {
     /** Main screen title (Home, Rewards, …) */
     screenTitle: {
       fontSize: 28,
-      fontWeight: '800',
+      fontWeight: '700',
       color: colors.text,
-      letterSpacing: -0.6,
+      letterSpacing: -0.5,
       marginBottom: 8,
     },
     /** One line under the main title */
@@ -31,16 +38,16 @@ export function createDashboardStyles(colors: AppPalette) {
     /** Secondary section title (e.g. “Surveys”, “Recent activity”) */
     sectionHeading: {
       fontSize: 20,
-      fontWeight: '800',
+      fontWeight: '700',
       color: colors.text,
-      letterSpacing: -0.35,
+      letterSpacing: -0.3,
       marginTop: 18,
       marginBottom: 14,
     },
     /** Small uppercase label above a block */
     overline: {
       fontSize: 12,
-      fontWeight: '700',
+      fontWeight: '600',
       color: colors.textMuted,
       textTransform: 'uppercase',
       letterSpacing: 1,
@@ -85,7 +92,7 @@ export function createDashboardStyles(colors: AppPalette) {
     },
     statLabel: {
       fontSize: 11,
-      fontWeight: '700',
+      fontWeight: '600',
       color: colors.textMuted,
       letterSpacing: 0.9,
       textTransform: 'uppercase',
@@ -93,9 +100,9 @@ export function createDashboardStyles(colors: AppPalette) {
     },
     statValue: {
       fontSize: 20,
-      fontWeight: '800',
+      fontWeight: '600',
       color: colors.text,
-      letterSpacing: -0.3,
+      letterSpacing: -0.25,
     },
     listCard: {
       backgroundColor: colors.surface,
@@ -107,9 +114,9 @@ export function createDashboardStyles(colors: AppPalette) {
     },
     listCardTitle: {
       fontSize: 16,
-      fontWeight: '800',
+      fontWeight: '600',
       color: colors.text,
-      letterSpacing: -0.2,
+      letterSpacing: -0.15,
       marginBottom: 6,
     },
     listCardMeta: {
@@ -192,20 +199,20 @@ export function createDashboardStyles(colors: AppPalette) {
     activityTitle: {
       flex: 1,
       fontSize: 15,
-      fontWeight: '800',
+      fontWeight: '600',
       color: colors.text,
-      letterSpacing: -0.15,
+      letterSpacing: -0.1,
     },
     activityDelta: {
       fontSize: 15,
-      fontWeight: '800',
+      fontWeight: '600',
     },
   });
 }
 
 export const dashboardHeaderTitleStyle = (colors: AppPalette) => ({
   fontSize: 17,
-  fontWeight: '800' as const,
-  letterSpacing: -0.35,
+  fontWeight: '600' as const,
+  letterSpacing: -0.25,
   color: colors.text,
 });

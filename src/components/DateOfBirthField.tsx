@@ -54,18 +54,17 @@ export function DateOfBirthField({
     setOpen(true);
   }, [value]);
 
-  const onAndroidChange = useCallback(
-    (event: { type?: string }, date?: Date) => {
+  const onAndroidValueChange = useCallback(
+    (_event: unknown, date: Date) => {
       setOpen(false);
-      if (event.type === 'dismissed') {
-        return;
-      }
-      if (date) {
-        onChange(date);
-      }
+      onChange(date);
     },
     [onChange],
   );
+
+  const onAndroidDismiss = useCallback(() => {
+    setOpen(false);
+  }, []);
 
   const confirmIos = useCallback(() => {
     onChange(iosTemp);
@@ -124,6 +123,17 @@ export function DateOfBirthField({
         modalBtn: { fontSize: 17, fontWeight: '600' },
         modalCancel: { color: colors.textSecondary },
         modalDone: { color: colors.primary },
+        /** UIDatePicker spinner needs a fixed height inside RN Modal or it can render empty (iOS). */
+        iosPickerWrap: {
+          width: '100%',
+          height: 216,
+          backgroundColor: colors.surface,
+          alignItems: 'stretch' as const,
+        },
+        iosPicker: {
+          width: '100%',
+          height: 216,
+        },
       }),
     [colors],
   );
@@ -163,7 +173,8 @@ export function DateOfBirthField({
           value={value ?? DEFAULT_FALLBACK_DATE}
           mode="date"
           display="default"
-          onChange={onAndroidChange}
+          onValueChange={onAndroidValueChange}
+          onDismiss={onAndroidDismiss}
           maximumDate={max}
           minimumDate={minDate}
         />
@@ -210,19 +221,19 @@ export function DateOfBirthField({
                   </Text>
                 </Pressable>
               </View>
-              <DateTimePicker
-                value={iosTemp}
-                mode="date"
-                display="spinner"
-                onChange={(_, d) => {
-                  if (d) {
-                    setIosTemp(d);
-                  }
-                }}
-                maximumDate={max}
-                minimumDate={minDate}
-                themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
-              />
+              <View style={styles.iosPickerWrap}>
+                <DateTimePicker
+                  value={iosTemp}
+                  mode="date"
+                  display="spinner"
+                  style={styles.iosPicker}
+                  onValueChange={(_event, d) => setIosTemp(d)}
+                  maximumDate={max}
+                  minimumDate={minDate}
+                  themeVariant={colorScheme === 'dark' ? 'dark' : 'light'}
+                  textColor={colors.text}
+                />
+              </View>
             </View>
           </View>
         </Modal>

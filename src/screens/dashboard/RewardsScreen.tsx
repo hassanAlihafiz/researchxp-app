@@ -4,7 +4,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../../navigation/types';
 import { dummyRewardsActivity, dummyRewardsSummary } from '../../data/dummyData';
-import { createDashboardStyles } from '../../theme/dashboardStyles';
+import {
+  createDashboardStyles,
+  DASHBOARD_SCROLL_PADDING_TOP,
+} from '../../theme/dashboardStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Rewards'>;
@@ -40,7 +43,7 @@ export default function RewardsScreen(_props: Props) {
     <ScrollView
       style={styles.root}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>

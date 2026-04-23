@@ -4,7 +4,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DrawerScreenProps } from '@react-navigation/drawer';
 import type { MainDrawerParamList } from '../../navigation/types';
 import type { ColorScheme } from '../../theme/palettes';
-import { createDashboardStyles } from '../../theme/dashboardStyles';
+import {
+  createDashboardStyles,
+  DASHBOARD_SCROLL_PADDING_TOP,
+} from '../../theme/dashboardStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = DrawerScreenProps<MainDrawerParamList, 'Settings'>;
@@ -22,7 +25,7 @@ export default function SettingsScreen(_props: Props) {
     <ScrollView
       style={styles.root}
       contentContainerStyle={{
-        paddingTop: insets.top + 16,
+        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>

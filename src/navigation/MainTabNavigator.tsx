@@ -31,7 +31,7 @@ export function MainTabNavigator() {
       },
       tabBarActiveTintColor: colors.primary,
       tabBarInactiveTintColor: colors.textMuted,
-      tabBarLabelStyle: { fontSize: 12, fontWeight: '600' as const },
+      tabBarLabelStyle: { fontSize: 12, fontWeight: '500' as const },
     }),
     [colors],
   );
