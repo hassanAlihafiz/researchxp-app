@@ -9,26 +9,20 @@ import {
   View,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import {
-  resendVerificationEmail,
-  verifyEmailWithCode,
-} from '../../api/auth';
-import { useAuth } from '../../auth/AuthContext';
+import { resendForgotPasswordCode } from '../../api/auth';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import type { RootStackParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
-type Props = NativeStackScreenProps<RootStackParamList, 'VerifyEmail'>;
-
 const RESEND_COOLDOWN_SEC = 45;
 
-const VerifyEmailScreen = ({ navigation, route }: Props) => {
+type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPasswordCode'>;
+
+export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
   const { colors } = useAppTheme();
-  const { signInWithSession } = useAuth();
   const email = (route.params?.email ?? '').trim().toLowerCase();
   const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
@@ -37,7 +31,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
       StyleSheet.create({
         title: {
           fontSize: 28,
-          fontWeight: '800',
+          fontWeight: '700',
           letterSpacing: -0.5,
           color: colors.text,
           marginBottom: 8,
@@ -52,9 +46,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
           fontWeight: '700',
           color: colors.text,
         },
-        field: {
-          marginBottom: 18,
-        },
+        field: { marginBottom: 18 },
         label: {
           fontSize: 13,
           fontWeight: '600',
@@ -80,9 +72,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
           paddingVertical: 16,
           alignItems: 'center',
         },
-        buttonDisabled: {
-          opacity: 0.7,
-        },
+        buttonDisabled: { opacity: 0.7 },
         buttonText: {
           color: colors.onPrimary,
           fontSize: 16,
@@ -105,7 +95,6 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
         footer: {
           marginTop: 24,
           alignItems: 'center',
-          paddingBottom: 4,
         },
         footerLink: {
           fontSize: 15,
@@ -117,12 +106,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
   );
 
   const tickResend = useCallback(() => {
-    setResendCooldown(s => {
-      if (s <= 1) {
-        return 0;
-      }
-      return s - 1;
-    });
+    setResendCooldown(s => (s <= 1 ? 0 : s - 1));
   }, []);
 
   useEffect(() => {
@@ -135,7 +119,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
 
   useEffect(() => {
     if (!email) {
-      navigation.replace('Login');
+      navigation.replace('ForgotPasswordEmail');
     }
   }, [email, navigation]);
 
@@ -143,28 +127,13 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
     return null;
   }
 
-  const onVerify = async () => {
+  const onContinue = () => {
     const digits = code.replace(/\D/g, '');
     if (digits.length !== 6) {
       Alert.alert('Invalid code', 'Enter the 6-digit code from your email.');
       return;
     }
-    setLoading(true);
-    try {
-      const result = await verifyEmailWithCode(email, digits);
-      if (!result.ok) {
-        Alert.alert('Verification failed', result.message);
-        return;
-      }
-      await signInWithSession({
-        email: result.user.email.trim().toLowerCase(),
-        token: result.token,
-        user: result.user,
-      });
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
-    } finally {
-      setLoading(false);
-    }
+    navigation.navigate('ForgotPasswordNew', { email, code: digits });
   };
 
   const onResend = async () => {
@@ -173,7 +142,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
     }
     setResendLoading(true);
     try {
-      const result = await resendVerificationEmail(email);
+      const result = await resendForgotPasswordCode(email);
       if (!result.ok) {
         Alert.alert('Could not resend', result.message);
         return;
@@ -187,11 +156,11 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Verify your email</Text>
+      <Text style={styles.title}>Enter code</Text>
       <Text style={styles.subtitle}>
-        We sent a 6-digit code to{' '}
-        <Text style={styles.emailHighlight}>{email}</Text>. Enter it below to
-        activate your account.
+        We sent a reset code to{' '}
+        <Text style={styles.emailHighlight}>{email}</Text>. Enter it below, then
+        choose a new password.
       </Text>
 
       <View style={styles.field}>
@@ -204,32 +173,23 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
           maxLength={6}
           placeholder="000000"
           placeholderTextColor={colors.placeholder}
-          editable={!loading}
+          editable={!resendLoading}
           autoFocus
         />
       </View>
 
-      <AppPressable
-        style={[styles.button, loading && styles.buttonDisabled]}
-        onPress={onVerify}
-        disabled={loading}>
-        {loading ? (
-          <ActivityIndicator color={colors.onPrimary} />
-        ) : (
-          <Text style={styles.buttonText}>Verify and continue</Text>
-        )}
+      <AppPressable style={styles.button} onPress={onContinue}>
+        <Text style={styles.buttonText}>Continue</Text>
       </AppPressable>
 
       <AppPressable
         style={styles.secondaryBtn}
         onPress={onResend}
-        disabled={resendLoading || resendCooldown > 0 || loading}>
+        disabled={resendLoading || resendCooldown > 0}>
         {resendLoading ? (
           <ActivityIndicator color={colors.primary} />
         ) : resendCooldown > 0 ? (
-          <Text style={styles.secondaryMuted}>
-            Resend code in {resendCooldown}s
-          </Text>
+          <Text style={styles.secondaryMuted}>Resend code in {resendCooldown}s</Text>
         ) : (
           <Text style={styles.secondaryText}>Resend code</Text>
         )}
@@ -237,14 +197,11 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
 
       <View style={styles.footer}>
         <AppPressable
-          onPress={() => navigation.navigate('Login')}
-          disabled={loading}
+          onPress={() => navigation.navigate('ForgotPasswordEmail')}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Back to sign in</Text>
+          <Text style={styles.footerLink}>Use a different email</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>
   );
-};
-
-export default VerifyEmailScreen;
+}

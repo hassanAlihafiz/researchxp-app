@@ -7,6 +7,9 @@ import { MainDrawerNavigator } from './MainDrawerNavigator';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import VerifyEmailScreen from '../screens/auth/VerifyEmailScreen';
+import ForgotPasswordEmailScreen from '../screens/auth/ForgotPasswordEmailScreen';
+import ForgotPasswordCodeScreen from '../screens/auth/ForgotPasswordCodeScreen';
+import ForgotPasswordNewScreen from '../screens/auth/ForgotPasswordNewScreen';
 import SplashScreen from '../screens/SplashScreen';
 import { useAppTheme } from '../theme/ThemeContext';
 import { appLog } from '../utils/appLog';
@@ -59,6 +62,21 @@ export function RootNavigator() {
         <Stack.Screen
           name="VerifyEmail"
           component={VerifyEmailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgotPasswordEmail"
+          component={ForgotPasswordEmailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgotPasswordCode"
+          component={ForgotPasswordCodeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ForgotPasswordNew"
+          component={ForgotPasswordNewScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

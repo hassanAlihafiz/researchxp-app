@@ -1,13 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { Platform, StyleSheet, TextInput, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import type { AppPalette } from '../theme/palettes';
+import { AppPressable } from './AppPressable';
 
 type Props = {
   value: string;
@@ -72,7 +67,7 @@ export function PasswordField({
         autoCorrect={false}
         textContentType="password"
       />
-      <Pressable
+      <AppPressable
         style={styles.eye}
         onPress={() => setVisible(v => !v)}
         hitSlop={8}
@@ -85,7 +80,7 @@ export function PasswordField({
           size={22}
           color={colors.textSecondary}
         />
-      </Pressable>
+      </AppPressable>
     </View>
   );
 }

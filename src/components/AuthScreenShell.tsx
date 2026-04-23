@@ -79,7 +79,8 @@ export function AuthScreenShell({
         scrollContent: {
           paddingHorizontal: 24,
           paddingTop: 28,
-          paddingBottom: Math.max(insets.bottom, 24),
+          /** Extra space so the last field can scroll above the keyboard (Register, etc.). */
+          paddingBottom: Math.max(insets.bottom, 24) + 48,
           flexGrow: 1,
         },
       }),
@@ -98,6 +99,8 @@ export function AuthScreenShell({
           <View style={styles.card}>
             <ScrollView
               keyboardShouldPersistTaps="handled"
+              keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+              automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
               showsVerticalScrollIndicator={false}
               contentContainerStyle={[styles.scrollContent, contentContainerStyle]}
             >

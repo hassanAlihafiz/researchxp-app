@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Alert,
   Platform,
-  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -11,6 +10,7 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { registerMember } from '../../api/registerMember';
+import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import { DateOfBirthField } from '../../components/DateOfBirthField';
 import { PasswordField } from '../../components/PasswordField';
@@ -235,7 +235,7 @@ const RegisterScreen = ({ navigation }: Props) => {
         />
       </View>
 
-      <Pressable
+      <AppPressable
         style={[styles.button, loading && styles.buttonDisabled]}
         onPress={onSubmit}
         disabled={loading}>
@@ -244,16 +244,16 @@ const RegisterScreen = ({ navigation }: Props) => {
         ) : (
           <Text style={styles.buttonText}>Create account</Text>
         )}
-      </Pressable>
+      </AppPressable>
 
       <View style={styles.footer}>
         <Text style={styles.footerText}>Already have an account?</Text>
-        <Pressable
+        <AppPressable
           onPress={() => navigation.navigate('Login')}
           disabled={loading}
           hitSlop={12}>
           <Text style={styles.footerLink}>Sign in</Text>
-        </Pressable>
+        </AppPressable>
       </View>
     </AuthScreenShell>
   );
