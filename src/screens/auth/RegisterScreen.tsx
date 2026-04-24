@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { useLocale } from '../../locale';
 import {
   ActivityIndicator,
   Alert,
@@ -26,6 +27,21 @@ const MIN_DOB = new Date(1900, 0, 1);
 
 const RegisterScreen = ({ navigation }: Props) => {
   const { colors, colorScheme } = useAppTheme();
+  const { t } = useLocale();
+
+  const dobLocaleStrings = useMemo(
+    () => ({
+      tapToChoose: t('dateOfBirth.tapToChoose'),
+      clear: t('dateOfBirth.clear'),
+      iosCancel: t('dateOfBirth.iosCancel'),
+      iosDone: t('dateOfBirth.iosDone'),
+      iosTitle: t('dateOfBirth.iosTitle'),
+      chooseA11y: t('dateOfBirth.chooseA11y'),
+      clearA11y: t('dateOfBirth.clearA11y'),
+      closePickerA11y: t('dateOfBirth.closePickerA11y'),
+    }),
+    [t],
+  );
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,19 +131,31 @@ const RegisterScreen = ({ navigation }: Props) => {
     const dobStr = dobDate ? toIsoDateString(dobDate) : '';
 
     if (!trimmedName) {
-      Alert.alert('Missing name', 'Please enter your name.');
+      Alert.alert(
+        t('register.alertMissingNameTitle'),
+        t('register.alertMissingNameBody'),
+      );
       return;
     }
     if (!trimmedEmail || !EMAIL_RE.test(trimmedEmail)) {
-      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      Alert.alert(
+        t('register.alertInvalidEmailTitle'),
+        t('register.alertInvalidEmailBody'),
+      );
       return;
     }
     if (password.length < 8) {
-      Alert.alert('Weak password', 'Password must be at least 8 characters.');
+      Alert.alert(
+        t('register.alertWeakPasswordTitle'),
+        t('register.alertWeakPasswordBody'),
+      );
       return;
     }
     if (password !== confirmPassword) {
-      Alert.alert('Passwords do not match', 'Re-enter your password to confirm.');
+      Alert.alert(
+        t('register.alertMismatchTitle'),
+        t('register.alertMismatchBody'),
+      );
       return;
     }
 
@@ -142,7 +170,7 @@ const RegisterScreen = ({ navigation }: Props) => {
       });
 
       if (!result.ok) {
-        Alert.alert('Registration failed', result.message);
+        Alert.alert(t('register.alertRegistrationFailedTitle'), result.message);
         return;
       }
 
@@ -156,26 +184,24 @@ const RegisterScreen = ({ navigation }: Props) => {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Create account</Text>
-      <Text style={styles.subtitle}>
-        Join ResearchXP with the same details you use on the web.
-      </Text>
+      <Text style={styles.title}>{t('register.title')}</Text>
+      <Text style={styles.subtitle}>{t('register.subtitle')}</Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Full name</Text>
+        <Text style={styles.label}>{t('register.fullName')}</Text>
         <TextInput
           style={styles.input}
           value={name}
           onChangeText={setName}
           autoCapitalize="words"
-          placeholder="Jane Doe"
+          placeholder={t('register.namePlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>{t('register.email')}</Text>
         <TextInput
           style={styles.input}
           value={email}
@@ -183,29 +209,29 @@ const RegisterScreen = ({ navigation }: Props) => {
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
-          placeholder="you@company.com"
+          placeholder={t('register.emailPlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t('register.password')}</Text>
         <PasswordField
           value={password}
           onChangeText={setPassword}
-          placeholder="At least 8 characters"
+          placeholder={t('register.passwordPlaceholder')}
           colors={colors}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Confirm password</Text>
+        <Text style={styles.label}>{t('register.confirmPassword')}</Text>
         <PasswordField
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          placeholder="••••••••"
+          placeholder={t('register.confirmPlaceholder')}
           colors={colors}
           editable={!loading}
         />
@@ -216,20 +242,21 @@ const RegisterScreen = ({ navigation }: Props) => {
         onChange={setDobDate}
         colors={colors}
         colorScheme={colorScheme}
-        label="Date of birth (optional)"
-        hint="Used for your profile. You can leave this blank."
+        label={t('register.dobLabel')}
+        hint={t('register.dobHint')}
+        localeStrings={dobLocaleStrings}
         disabled={loading}
         minDate={MIN_DOB}
         maxDate={maxDob}
       />
 
       <View style={styles.field}>
-        <Text style={styles.label}>Education (optional)</Text>
+        <Text style={styles.label}>{t('register.educationOptional')}</Text>
         <TextInput
           style={styles.input}
           value={education}
           onChangeText={setEducation}
-          placeholder="e.g. Bachelor's in Biology"
+          placeholder={t('register.educationPlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
         />
@@ -242,17 +269,17 @@ const RegisterScreen = ({ navigation }: Props) => {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>Create account</Text>
+          <Text style={styles.buttonText}>{t('register.submit')}</Text>
         )}
       </AppPressable>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Already have an account?</Text>
+        <Text style={styles.footerText}>{t('register.footerHaveAccount')}</Text>
         <AppPressable
           onPress={() => navigation.navigate('Login')}
           disabled={loading}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Sign in</Text>
+          <Text style={styles.footerLink}>{t('register.footerSignIn')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>

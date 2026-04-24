@@ -15,6 +15,7 @@ import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -24,6 +25,7 @@ const MIN_PASSWORD_LEN = 8;
 
 const LoginScreen = ({ navigation }: Props) => {
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const { signInWithSession } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -115,17 +117,23 @@ const LoginScreen = ({ navigation }: Props) => {
   const onSubmit = async () => {
     const trimmedEmail = email.trim().toLowerCase();
     if (!trimmedEmail || !EMAIL_RE.test(trimmedEmail)) {
-      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      Alert.alert(
+        t('login.alertInvalidEmailTitle'),
+        t('login.alertInvalidEmailBody'),
+      );
       return;
     }
     if (!password) {
-      Alert.alert('Password required', 'Enter your password.');
+      Alert.alert(
+        t('login.alertPasswordRequiredTitle'),
+        t('login.alertPasswordRequiredBody'),
+      );
       return;
     }
     if (password.length < MIN_PASSWORD_LEN) {
       Alert.alert(
-        'Invalid password',
-        `Password must be at least ${MIN_PASSWORD_LEN} characters.`,
+        t('login.alertPasswordShortTitle'),
+        t('login.alertPasswordShortBody', { min: MIN_PASSWORD_LEN }),
       );
       return;
     }
@@ -148,9 +156,9 @@ const LoginScreen = ({ navigation }: Props) => {
         const resend = await resendVerificationEmail(trimmedEmail);
         if (!resend.ok) {
           Alert.alert(
-            'Email not verified',
-            `We could not send a new code: ${resend.message}. You can try “Resend code” on the next screen.`,
-            [{ text: 'OK', onPress: () => goToVerify(trimmedEmail) }],
+            t('login.alertEmailNotVerifiedTitle'),
+            t('login.alertEmailNotVerifiedBody', { message: resend.message }),
+            [{ text: t('common.ok'), onPress: () => goToVerify(trimmedEmail) }],
           );
           return;
         }
@@ -158,7 +166,7 @@ const LoginScreen = ({ navigation }: Props) => {
         return;
       }
 
-      Alert.alert('Sign in failed', result.message);
+      Alert.alert(t('login.alertSignInFailedTitle'), result.message);
     } finally {
       setLoading(false);
     }
@@ -166,13 +174,11 @@ const LoginScreen = ({ navigation }: Props) => {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Sign in</Text>
-      <Text style={styles.subtitle}>
-        Sign in with your ResearchXP account.
-      </Text>
+      <Text style={styles.title}>{t('login.title')}</Text>
+      <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>{t('common.email')}</Text>
         <TextInput
           style={styles.input}
           value={email}
@@ -180,18 +186,18 @@ const LoginScreen = ({ navigation }: Props) => {
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
-          placeholder="you@company.com"
+          placeholder={t('login.emailPlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Password</Text>
+        <Text style={styles.label}>{t('login.password')}</Text>
         <PasswordField
           value={password}
           onChangeText={setPassword}
-          placeholder="••••••••"
+          placeholder={t('login.passwordPlaceholder')}
           colors={colors}
           editable={!loading}
         />
@@ -201,8 +207,8 @@ const LoginScreen = ({ navigation }: Props) => {
           disabled={loading}
           hitSlop={8}
           accessibilityRole="link"
-          accessibilityLabel="Forgot password">
-          <Text style={styles.forgotLink}>Forgot password?</Text>
+          accessibilityLabel={t('login.forgotPasswordA11y')}>
+          <Text style={styles.forgotLink}>{t('login.forgotPassword')}</Text>
         </AppPressable>
       </View>
 
@@ -213,17 +219,17 @@ const LoginScreen = ({ navigation }: Props) => {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>Continue</Text>
+          <Text style={styles.buttonText}>{t('login.continue')}</Text>
         )}
       </AppPressable>
 
       <View style={styles.footer}>
-        <Text style={styles.footerText}>New to ResearchXP?</Text>
+        <Text style={styles.footerText}>{t('login.footerNew')}</Text>
         <AppPressable
           onPress={() => navigation.navigate('Register')}
           disabled={loading}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Create an account</Text>
+          <Text style={styles.footerLink}>{t('login.footerCreate')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>

@@ -12,12 +12,14 @@ import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPasswordNew'>;
 
 export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const email = (route.params?.email ?? '').trim().toLowerCase();
   const code = (route.params?.code ?? '').replace(/\D/g, '');
   const [password, setPassword] = useState('');
@@ -89,23 +91,29 @@ export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
 
   const onSubmit = async () => {
     if (password.length < 8) {
-      Alert.alert('Password too short', 'Use at least 8 characters.');
+      Alert.alert(
+        t('forgotNew.alertTooShortTitle'),
+        t('forgotNew.alertTooShortBody'),
+      );
       return;
     }
     if (password !== confirm) {
-      Alert.alert('Mismatch', 'Password and confirmation do not match.');
+      Alert.alert(
+        t('forgotNew.alertMismatchTitle'),
+        t('forgotNew.alertMismatchBody'),
+      );
       return;
     }
     setLoading(true);
     try {
       const result = await resetPasswordWithCode(email, code, password);
       if (!result.ok) {
-        Alert.alert('Could not reset password', result.message);
+        Alert.alert(t('forgotNew.alertCouldNotResetTitle'), result.message);
         return;
       }
-      Alert.alert('Password updated', result.message, [
+      Alert.alert(t('forgotNew.alertPasswordUpdatedTitle'), result.message, [
         {
-          text: 'OK',
+          text: t('common.ok'),
           onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Login' }] }),
         },
       ]);
@@ -116,29 +124,30 @@ export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>New password</Text>
+      <Text style={styles.title}>{t('forgotNew.title')}</Text>
       <Text style={styles.subtitle}>
-        Choose a new password for{' '}
-        <Text style={styles.emailHighlight}>{email}</Text>.
+        {t('forgotNew.subtitleBefore')}
+        <Text style={styles.emailHighlight}>{email}</Text>
+        {t('forgotNew.subtitleAfter')}
       </Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>New password</Text>
+        <Text style={styles.label}>{t('forgotNew.newPassword')}</Text>
         <PasswordField
           value={password}
           onChangeText={setPassword}
-          placeholder="At least 8 characters"
+          placeholder={t('forgotNew.newPasswordPlaceholder')}
           colors={colors}
           editable={!loading}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Confirm password</Text>
+        <Text style={styles.label}>{t('forgotNew.confirmPassword')}</Text>
         <PasswordField
           value={confirm}
           onChangeText={setConfirm}
-          placeholder="Repeat password"
+          placeholder={t('forgotNew.confirmPlaceholder')}
           colors={colors}
           editable={!loading}
         />
@@ -151,7 +160,7 @@ export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>Update password</Text>
+          <Text style={styles.buttonText}>{t('forgotNew.updateButton')}</Text>
         )}
       </AppPressable>
 
@@ -160,7 +169,7 @@ export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
           onPress={() => navigation.navigate('ForgotPasswordCode', { email })}
           disabled={loading}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Back to code</Text>
+          <Text style={styles.footerLink}>{t('forgotNew.backToCode')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>

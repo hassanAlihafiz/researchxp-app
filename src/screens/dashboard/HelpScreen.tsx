@@ -5,11 +5,13 @@ import {
   createDashboardStyles,
   DASHBOARD_SCROLL_PADDING_TOP,
 } from '../../theme/dashboardStyles';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 export default function HelpScreen() {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const styles = useMemo(() => createDashboardStyles(colors), [colors]);
 
   return (
@@ -20,31 +22,17 @@ export default function HelpScreen() {
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>
-      <Text style={styles.screenTitle}>Help</Text>
-      <Text style={styles.screenLead}>
-        Find answers and reach the ResearchXP team when you need support in the
-        field.
-      </Text>
+      <Text style={styles.screenTitle}>{t('help.screenTitle')}</Text>
+      <Text style={styles.screenLead}>{t('help.screenLead')}</Text>
 
-      <Text style={styles.sectionHeading}>Getting started</Text>
-      <Text style={styles.paragraph}>
-        Complete onboarding, check your rewards balance on the Home tab, and
-        open surveys you are matched with. Use the drawer (☰) for Settings and
-        this Help screen.
-      </Text>
+      <Text style={styles.sectionHeading}>{t('help.gettingStarted')}</Text>
+      <Text style={styles.paragraph}>{t('help.gettingStartedBody')}</Text>
 
-      <Text style={styles.sectionHeading}>FAQs</Text>
-      <Text style={styles.paragraph}>
-        Frequently asked questions will appear here—link to your knowledge base
-        or embed summaries for common tasks (points, eligibility, survey
-        completion).
-      </Text>
+      <Text style={styles.sectionHeading}>{t('help.faqs')}</Text>
+      <Text style={styles.paragraph}>{t('help.faqsBody')}</Text>
 
-      <Text style={styles.sectionHeading}>Contact</Text>
-      <Text style={styles.paragraphLast}>
-        Add support email, phone, or in-app chat when your support channels are
-        ready.
-      </Text>
+      <Text style={styles.sectionHeading}>{t('help.contact')}</Text>
+      <Text style={styles.paragraphLast}>{t('help.contactBody')}</Text>
     </ScrollView>
   );
 }

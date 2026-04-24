@@ -3,6 +3,7 @@ import { StatusBar, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/auth/AuthContext';
+import { LocaleProvider } from './src/locale';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { ThemeProvider, useAppTheme } from './src/theme/ThemeContext';
 
@@ -28,9 +29,11 @@ function App() {
   return (
     <GestureHandlerRootView style={styles.flex}>
       <SafeAreaProvider style={styles.flex}>
-        <ThemeProvider>
-          <ThemedAppShell />
-        </ThemeProvider>
+        <LocaleProvider>
+          <ThemeProvider>
+            <ThemedAppShell />
+          </ThemeProvider>
+        </LocaleProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

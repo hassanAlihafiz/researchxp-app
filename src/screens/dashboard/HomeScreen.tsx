@@ -8,6 +8,7 @@ import {
   createDashboardStyles,
   DASHBOARD_SCROLL_PADDING_TOP,
 } from '../../theme/dashboardStyles';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
@@ -15,6 +16,7 @@ type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 export default function HomeScreen(_props: Props) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const styles = useMemo(() => createDashboardStyles(colors), [colors]);
 
   return (
@@ -25,52 +27,47 @@ export default function HomeScreen(_props: Props) {
         paddingBottom: insets.bottom + 28,
       }}
       showsVerticalScrollIndicator={false}>
-      <Text style={styles.screenTitle}>Home</Text>
-      <Text style={styles.screenLead}>
-        Your field workspace: points, surveys, and quick access to settings.
-      </Text>
+      <Text style={styles.screenTitle}>{t('home.screenTitle')}</Text>
+      <Text style={styles.screenLead}>{t('home.screenLead')}</Text>
 
-      <Text style={styles.overline}>Points overview</Text>
+      <Text style={styles.overline}>{t('home.pointsOverview')}</Text>
       <View style={styles.cardsRow}>
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Available</Text>
+          <Text style={styles.statLabel}>{t('home.statAvailable')}</Text>
           <Text style={styles.statValue}>
             {dummyRewardsSummary.availableBalance.toLocaleString()}
           </Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>Redeemed</Text>
+          <Text style={styles.statLabel}>{t('home.statRedeemed')}</Text>
           <Text style={styles.statValue}>
             {dummyRewardsSummary.totalRedeemed.toLocaleString()}
           </Text>
         </View>
         <View style={styles.statCard}>
-          <Text style={styles.statLabel}>In review</Text>
+          <Text style={styles.statLabel}>{t('home.statInReview')}</Text>
           <Text style={styles.statValue}>
             {dummyRewardsSummary.underReview.toLocaleString()}
           </Text>
         </View>
       </View>
 
-      <Text style={styles.sectionHeading}>Surveys</Text>
+      <Text style={styles.sectionHeading}>{t('home.surveysHeading')}</Text>
       {dummySurveys.map(survey => (
         <View key={survey.id} style={styles.listCard}>
           <Text style={styles.listCardTitle}>{survey.title}</Text>
           <Text style={styles.listCardMeta}>
-            {survey.duration} • {survey.pointsAwarded.toLocaleString()} pts
-            {survey.dueIn ? ` • Due in ${survey.dueIn}` : ''}
+            {survey.duration} • {survey.pointsAwarded.toLocaleString()}{' '}
+            {t('home.surveyMetaPts')}
+            {survey.dueIn ? t('home.surveyMetaDue', { when: survey.dueIn }) : ''}
           </Text>
         </View>
       ))}
 
       <Text style={[styles.paragraph, { marginTop: 8 }]}>
-        Surveys you are matched with will appear here so you can conduct them in
-        the field. Use the Rewards and Profile tabs for incentives and your
-        account.
+        {t('home.footerParagraph')}
       </Text>
-      <Text style={styles.hint}>
-        Tap ☰ in the header to open Settings and Help.
-      </Text>
+      <Text style={styles.hint}>{t('home.footerHint')}</Text>
     </ScrollView>
   );
 }

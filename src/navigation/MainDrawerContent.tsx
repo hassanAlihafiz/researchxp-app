@@ -9,13 +9,15 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppPressable } from '../components/AppPressable';
 import { useAuth } from '../auth/AuthContext';
+import { useLocale } from '../locale';
 import { resetToLogin } from './navigationRef';
 import { useAppTheme } from '../theme/ThemeContext';
 
 export function MainDrawerContent(props: DrawerContentComponentProps) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
-  const { email, signOut } = useAuth();
+  const { t } = useLocale();
+  const { signOut } = useAuth();
 
   const onSignOut = async () => {
     props.navigation.closeDrawer();
@@ -79,11 +81,11 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
           style={({ pressed }) => [styles.signOutBtn, pressed && { opacity: 0.65 }]}
           onPress={onSignOut}
           accessibilityRole="button"
-          accessibilityLabel="Sign out">
+          accessibilityLabel={t('drawer.signOutA11y')}>
           <View style={styles.signOutIconWrap}>
             <Ionicons name="log-out-outline" size={22} color={colors.text} />
           </View>
-          <Text style={styles.signOutLabel}>Sign out</Text>
+          <Text style={styles.signOutLabel}>{t('drawer.signOut')}</Text>
         </AppPressable>
       </View>
     </View>

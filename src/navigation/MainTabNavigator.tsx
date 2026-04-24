@@ -10,6 +10,7 @@ import type { MainTabParamList } from './types';
 import HomeScreen from '../screens/dashboard/HomeScreen';
 import RewardsScreen from '../screens/dashboard/RewardsScreen';
 import ProfileScreen from '../screens/dashboard/ProfileScreen';
+import { useLocale } from '../locale';
 import { dashboardHeaderTitleStyle } from '../theme/dashboardStyles';
 import { useAppTheme } from '../theme/ThemeContext';
 
@@ -23,6 +24,7 @@ function TabBarButton(props: BottomTabBarButtonProps) {
 
 export function MainTabNavigator() {
   const { colors } = useAppTheme();
+  const { t, language } = useLocale();
 
   const screenOptions = useMemo(
     () => ({
@@ -42,7 +44,7 @@ export function MainTabNavigator() {
       tabBarLabelStyle: { fontSize: 12, fontWeight: '500' as const },
       tabBarButton: TabBarButton,
     }),
-    [colors],
+    [colors, language, t], // eslint-disable-line react-hooks/exhaustive-deps -- tab labels follow locale
   );
 
   return (
@@ -51,7 +53,8 @@ export function MainTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          tabBarLabel: 'Home',
+          title: t('nav.tabHome'),
+          tabBarLabel: t('nav.tabHome'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
@@ -65,8 +68,8 @@ export function MainTabNavigator() {
         name="Rewards"
         component={RewardsScreen}
         options={{
-          title: 'Rewards',
-          tabBarLabel: 'Rewards',
+          title: t('nav.tabRewards'),
+          tabBarLabel: t('nav.tabRewards'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'gift' : 'gift-outline'}
@@ -80,8 +83,8 @@ export function MainTabNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          title: 'Profile',
-          tabBarLabel: 'Profile',
+          title: t('nav.tabProfile'),
+          tabBarLabel: t('nav.tabProfile'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
