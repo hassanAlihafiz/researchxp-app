@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
 import { ResearchLogo } from '../components/ResearchLogo';
 import type { RootStackParamList } from '../navigation/types';
+import { useLocale } from '../locale';
 import { useAppTheme } from '../theme/ThemeContext';
 
 const MIN_DISPLAY_MS = 1600;
@@ -21,6 +22,7 @@ export default function SplashScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { isSignedIn, ready } = useAuth();
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const opacity = useRef(new Animated.Value(0)).current;
 
   const styles = useMemo(
@@ -87,7 +89,7 @@ export default function SplashScreen({ navigation }: Props) {
       showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.content, { opacity }]}>
         <ResearchLogo width={280} containerStyle={styles.logo} />
-        <Text style={styles.tagline}>Field research, simplified.</Text>
+        <Text style={styles.tagline}>{t('splash.tagline')}</Text>
         <ActivityIndicator
           style={styles.spinner}
           color={colors.primary}

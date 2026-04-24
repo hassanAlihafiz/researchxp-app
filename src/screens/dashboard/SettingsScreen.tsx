@@ -16,6 +16,7 @@ import { updateMyPassword } from '../../api/memberProfile';
 import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { PasswordField } from '../../components/PasswordField';
+import { APP_LANGUAGES, useLocale, type AppLanguage } from '../../locale';
 import type { MainDrawerParamList } from '../../navigation/types';
 import type { ColorScheme } from '../../theme/palettes';
 import {
@@ -26,13 +27,21 @@ import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = DrawerScreenProps<MainDrawerParamList, 'Settings'>;
 
+const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
+  en: 'settings.languageEnglish',
+  fr: 'settings.languageFrench',
+  es: 'settings.languageSpanish',
+};
+
 export default function SettingsScreen(_props: Props) {
   const insets = useSafeAreaInsets();
   const { colors, colorScheme, setColorScheme } = useAppTheme();
+  const { t, language, setLanguage } = useLocale();
   const { token } = useAuth();
   const styles = useMemo(() => createDashboardStyles(colors), [colors]);
 
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
+  const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -132,6 +141,28 @@ export default function SettingsScreen(_props: Props) {
           color: colors.textSecondary,
           marginBottom: 14,
         },
+        langRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingVertical: 16,
+          paddingHorizontal: 4,
+          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomColor: colors.border,
+        },
+        langRowLast: {
+          borderBottomWidth: 0,
+        },
+        langRowLabel: {
+          fontSize: 16,
+          fontWeight: '600',
+          color: colors.text,
+        },
+        langRowCheck: {
+          fontSize: 16,
+          fontWeight: '700',
+          color: colors.primary,
+        },
       }),
     [colors, insets.bottom],
   );
@@ -154,21 +185,38 @@ export default function SettingsScreen(_props: Props) {
     setColorScheme(scheme);
   };
 
+  const onSelectLanguage = (code: AppLanguage) => {
+    setLanguage(code);
+    setLanguageModalVisible(false);
+  };
+
   const onUpdatePassword = async () => {
     if (!token) {
-      Alert.alert('Not signed in', 'Sign in again to change your password.');
+      Alert.alert(
+        t('settings.alertNotSignedInTitle'),
+        t('settings.alertNotSignedInPasswordBody'),
+      );
       return;
     }
     if (!currentPassword) {
-      Alert.alert('Current password', 'Enter your current password.');
+      Alert.alert(
+        t('settings.alertCurrentPasswordTitle'),
+        t('settings.alertCurrentPasswordBody'),
+      );
       return;
     }
     if (newPassword.length < 8) {
-      Alert.alert('New password', 'Use at least 8 characters.');
+      Alert.alert(
+        t('settings.alertNewShortTitle'),
+        t('settings.alertNewShortBody'),
+      );
       return;
     }
     if (newPassword !== confirmPassword) {
-      Alert.alert('Mismatch', 'New password and confirmation do not match.');
+      Alert.alert(
+        t('settings.alertMismatchTitle'),
+        t('settings.alertMismatchBody'),
+      );
       return;
     }
     setPasswordSaving(true);
@@ -179,16 +227,19 @@ export default function SettingsScreen(_props: Props) {
       });
       if (!result.ok) {
         Alert.alert(
-          'Could not update password',
+          t('settings.alertUpdateFailedTitle'),
           result.status === 401
-            ? 'Current password is incorrect.'
+            ? t('settings.alertWrongCurrentBody')
             : result.message,
         );
         return;
       }
       setPasswordModalVisible(false);
       resetPasswordForm();
-      Alert.alert('Password updated', 'Your password has been changed.');
+      Alert.alert(
+        t('settings.alertPasswordUpdatedTitle'),
+        t('settings.alertPasswordUpdatedBody'),
+      );
     } finally {
       setPasswordSaving(false);
     }
@@ -204,26 +255,26 @@ export default function SettingsScreen(_props: Props) {
         }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        <Text style={styles.screenTitle}>Settings</Text>
-        <Text style={styles.screenLead}>
-          Appearance and other preferences for your account.
-        </Text>
+        <Text style={styles.screenTitle}>{t('settings.screenTitle')}</Text>
+        <Text style={styles.screenLead}>{t('settings.screenLead')}</Text>
 
-        <Text style={styles.overline}>Password</Text>
+        <Text style={styles.overline}>{t('settings.passwordOverline')}</Text>
         <View style={styles.elevatedBlock}>
           <Text style={modalStyles.passwordSectionHint}>
-            Change your sign-in password. You will need your current password.
+            {t('settings.passwordHint')}
           </Text>
           <AppPressable
             style={modalStyles.openPasswordBtn}
             onPress={() => setPasswordModalVisible(true)}
             accessibilityRole="button"
-            accessibilityLabel="Open update password form">
-            <Text style={modalStyles.openPasswordBtnText}>Update password</Text>
+            accessibilityLabel={t('settings.updatePasswordA11y')}>
+            <Text style={modalStyles.openPasswordBtnText}>
+              {t('settings.updatePassword')}
+            </Text>
           </AppPressable>
         </View>
 
-        <Text style={styles.overline}>Appearance</Text>
+        <Text style={styles.overline}>{t('settings.appearanceOverline')}</Text>
         <View style={styles.themeRow}>
           <AppPressable
             onPress={() => selectScheme('light')}
@@ -236,7 +287,7 @@ export default function SettingsScreen(_props: Props) {
                 styles.themeChipText,
                 colorScheme === 'light' && styles.themeChipTextActive,
               ]}>
-              Light
+              {t('settings.themeLight')}
             </Text>
           </AppPressable>
           <AppPressable
@@ -250,7 +301,23 @@ export default function SettingsScreen(_props: Props) {
                 styles.themeChipText,
                 colorScheme === 'dark' && styles.themeChipTextActive,
               ]}>
-              Dark
+              {t('settings.themeDark')}
+            </Text>
+          </AppPressable>
+        </View>
+
+        <Text style={styles.overline}>{t('settings.languageOverline')}</Text>
+        <View style={styles.elevatedBlock}>
+          <Text style={modalStyles.passwordSectionHint}>
+            {t('settings.languageHint')}
+          </Text>
+          <AppPressable
+            style={modalStyles.openPasswordBtn}
+            onPress={() => setLanguageModalVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel={t('settings.selectLanguageA11y')}>
+            <Text style={modalStyles.openPasswordBtnText}>
+              {t('settings.selectLanguage')}
             </Text>
           </AppPressable>
         </View>
@@ -268,18 +335,22 @@ export default function SettingsScreen(_props: Props) {
             <AppPressable
               style={StyleSheet.absoluteFill}
               onPress={closePasswordModal}
-              accessibilityLabel="Dismiss"
+              accessibilityLabel={t('settings.dismissA11y')}
             />
             <View style={modalStyles.sheet} pointerEvents="box-none">
               <View style={modalStyles.sheetHeader}>
-                <Text style={modalStyles.sheetTitle}>Update password</Text>
+                <Text style={modalStyles.sheetTitle}>
+                  {t('settings.passwordModalTitle')}
+                </Text>
                 <AppPressable
                   onPress={closePasswordModal}
                   disabled={passwordSaving}
                   style={modalStyles.closeBtn}
                   accessibilityRole="button"
-                  accessibilityLabel="Close">
-                  <Text style={modalStyles.closeBtnText}>Cancel</Text>
+                  accessibilityLabel={t('settings.closeA11y')}>
+                  <Text style={modalStyles.closeBtnText}>
+                    {t('common.cancel')}
+                  </Text>
                 </AppPressable>
               </View>
               <ScrollView
@@ -288,11 +359,12 @@ export default function SettingsScreen(_props: Props) {
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}>
                 <Text style={modalStyles.passwordHint}>
-                  Enter your current password, then choose a new one (at least 8
-                  characters).
+                  {t('settings.passwordModalHint')}
                 </Text>
                 <View style={modalStyles.field}>
-                  <Text style={modalStyles.label}>Current password</Text>
+                  <Text style={modalStyles.label}>
+                    {t('settings.currentPassword')}
+                  </Text>
                   <PasswordField
                     value={currentPassword}
                     onChangeText={setCurrentPassword}
@@ -302,21 +374,25 @@ export default function SettingsScreen(_props: Props) {
                   />
                 </View>
                 <View style={modalStyles.field}>
-                  <Text style={modalStyles.label}>New password</Text>
+                  <Text style={modalStyles.label}>
+                    {t('settings.newPassword')}
+                  </Text>
                   <PasswordField
                     value={newPassword}
                     onChangeText={setNewPassword}
-                    placeholder="At least 8 characters"
+                    placeholder={t('settings.newPasswordPlaceholder')}
                     colors={colors}
                     editable={!passwordSaving}
                   />
                 </View>
                 <View style={modalStyles.field}>
-                  <Text style={modalStyles.label}>Confirm new password</Text>
+                  <Text style={modalStyles.label}>
+                    {t('settings.confirmNewPassword')}
+                  </Text>
                   <PasswordField
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
-                    placeholder="Repeat new password"
+                    placeholder={t('settings.confirmNewPlaceholder')}
                     colors={colors}
                     editable={!passwordSaving}
                   />
@@ -329,17 +405,71 @@ export default function SettingsScreen(_props: Props) {
                   onPress={onUpdatePassword}
                   disabled={passwordSaving}
                   accessibilityRole="button"
-                  accessibilityLabel="Save new password">
+                  accessibilityLabel={t('settings.saveNewPasswordA11y')}>
                   {passwordSaving ? (
                     <ActivityIndicator color={colors.onPrimary} />
                   ) : (
-                    <Text style={modalStyles.saveText}>Save new password</Text>
+                    <Text style={modalStyles.saveText}>
+                      {t('settings.saveNewPassword')}
+                    </Text>
                   )}
                 </AppPressable>
               </ScrollView>
             </View>
           </View>
         </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={languageModalVisible}
+        animationType="slide"
+        transparent
+        onRequestClose={() => setLanguageModalVisible(false)}>
+        <View style={modalStyles.overlay}>
+          <AppPressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setLanguageModalVisible(false)}
+            accessibilityLabel={t('settings.dismissA11y')}
+          />
+          <View style={modalStyles.sheet} pointerEvents="box-none">
+            <View style={modalStyles.sheetHeader}>
+              <Text style={modalStyles.sheetTitle}>
+                {t('settings.languageModalTitle')}
+              </Text>
+              <AppPressable
+                onPress={() => setLanguageModalVisible(false)}
+                style={modalStyles.closeBtn}
+                accessibilityRole="button"
+                accessibilityLabel={t('settings.closeA11y')}>
+                <Text style={modalStyles.closeBtnText}>
+                  {t('common.cancel')}
+                </Text>
+              </AppPressable>
+            </View>
+            <View style={modalStyles.sheetBody}>
+              {APP_LANGUAGES.map((code, index) => (
+                <AppPressable
+                  key={code}
+                  style={[
+                    modalStyles.langRow,
+                    index === APP_LANGUAGES.length - 1 && modalStyles.langRowLast,
+                  ]}
+                  onPress={() => onSelectLanguage(code)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: language === code }}>
+                  <Text style={modalStyles.langRowLabel}>
+                    {t(LANGUAGE_LABEL_KEYS[code])}
+                  </Text>
+                  {language === code ? (
+                    <Text style={modalStyles.langRowCheck}>✓</Text>
+                  ) : (
+                    <View style={{ width: 18 }} />
+                  )}
+                </AppPressable>
+              ))}
+            </View>
+          </View>
+        </View>
       </Modal>
     </>
   );

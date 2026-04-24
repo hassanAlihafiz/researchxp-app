@@ -13,6 +13,7 @@ import { requestForgotPassword } from '../../api/auth';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import type { RootStackParamList } from '../../navigation/types';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -21,6 +22,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPasswordEmail'>;
 
 export default function ForgotPasswordEmailScreen({ navigation }: Props) {
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -86,14 +88,14 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
   const onSubmit = async () => {
     const trimmed = email.trim().toLowerCase();
     if (!trimmed || !EMAIL_RE.test(trimmed)) {
-      Alert.alert('Invalid email', 'Enter a valid email address.');
+      Alert.alert(t('forgotEmail.alertInvalidTitle'), t('forgotEmail.alertInvalidBody'));
       return;
     }
     setLoading(true);
     try {
       const result = await requestForgotPassword(trimmed);
       if (!result.ok) {
-        Alert.alert('Request failed', result.message);
+        Alert.alert(t('forgotEmail.alertRequestFailedTitle'), result.message);
         return;
       }
       navigation.navigate('ForgotPasswordCode', { email: trimmed });
@@ -104,14 +106,11 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Reset password</Text>
-      <Text style={styles.subtitle}>
-        Enter the email for your ResearchXP account. If it exists, we will send a
-        6-digit code valid for 15 minutes.
-      </Text>
+      <Text style={styles.title}>{t('forgotEmail.title')}</Text>
+      <Text style={styles.subtitle}>{t('forgotEmail.subtitle')}</Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Email</Text>
+        <Text style={styles.label}>{t('common.email')}</Text>
         <TextInput
           style={styles.input}
           value={email}
@@ -119,7 +118,7 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
-          placeholder="you@company.com"
+          placeholder={t('login.emailPlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
         />
@@ -132,13 +131,13 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>Send code</Text>
+          <Text style={styles.buttonText}>{t('forgotEmail.sendCode')}</Text>
         )}
       </AppPressable>
 
       <View style={styles.footer}>
         <AppPressable onPress={() => navigation.navigate('Login')} disabled={loading} hitSlop={12}>
-          <Text style={styles.footerLink}>Back to sign in</Text>
+          <Text style={styles.footerLink}>{t('forgotEmail.backToSignIn')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>

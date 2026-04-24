@@ -17,6 +17,7 @@ import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import type { RootStackParamList } from '../../navigation/types';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'VerifyEmail'>;
@@ -25,6 +26,7 @@ const RESEND_COOLDOWN_SEC = 45;
 
 const VerifyEmailScreen = ({ navigation, route }: Props) => {
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const { signInWithSession } = useAuth();
   const email = (route.params?.email ?? '').trim().toLowerCase();
   const [code, setCode] = useState('');
@@ -146,14 +148,17 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
   const onVerify = async () => {
     const digits = code.replace(/\D/g, '');
     if (digits.length !== 6) {
-      Alert.alert('Invalid code', 'Enter the 6-digit code from your email.');
+      Alert.alert(
+        t('verify.alertInvalidCodeTitle'),
+        t('verify.alertInvalidCodeBody'),
+      );
       return;
     }
     setLoading(true);
     try {
       const result = await verifyEmailWithCode(email, digits);
       if (!result.ok) {
-        Alert.alert('Verification failed', result.message);
+        Alert.alert(t('verify.alertVerificationFailedTitle'), result.message);
         return;
       }
       await signInWithSession({
@@ -175,11 +180,14 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
     try {
       const result = await resendVerificationEmail(email);
       if (!result.ok) {
-        Alert.alert('Could not resend', result.message);
+        Alert.alert(t('verify.alertCouldNotResendTitle'), result.message);
         return;
       }
       setResendCooldown(RESEND_COOLDOWN_SEC);
-      Alert.alert('Code sent', 'Check your inbox for a new 6-digit code.');
+      Alert.alert(
+        t('verify.alertCodeSentTitle'),
+        t('verify.alertCodeSentBody'),
+      );
     } finally {
       setResendLoading(false);
     }
@@ -187,22 +195,22 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Verify your email</Text>
+      <Text style={styles.title}>{t('verify.title')}</Text>
       <Text style={styles.subtitle}>
-        We sent a 6-digit code to{' '}
-        <Text style={styles.emailHighlight}>{email}</Text>. Enter it below to
-        activate your account.
+        {t('verify.subtitleBefore')}
+        <Text style={styles.emailHighlight}>{email}</Text>
+        {t('verify.subtitleAfter')}
       </Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Verification code</Text>
+        <Text style={styles.label}>{t('verify.codeLabel')}</Text>
         <TextInput
           style={styles.input}
           value={code}
-          onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
+          onChangeText={txt => setCode(txt.replace(/\D/g, '').slice(0, 6))}
           keyboardType="number-pad"
           maxLength={6}
-          placeholder="000000"
+          placeholder={t('verify.codePlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
           autoFocus
@@ -216,7 +224,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>Verify and continue</Text>
+          <Text style={styles.buttonText}>{t('verify.verifyButton')}</Text>
         )}
       </AppPressable>
 
@@ -228,10 +236,10 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
           <ActivityIndicator color={colors.primary} />
         ) : resendCooldown > 0 ? (
           <Text style={styles.secondaryMuted}>
-            Resend code in {resendCooldown}s
+            {t('verify.resendIn', { sec: resendCooldown })}
           </Text>
         ) : (
-          <Text style={styles.secondaryText}>Resend code</Text>
+          <Text style={styles.secondaryText}>{t('verify.resend')}</Text>
         )}
       </AppPressable>
 
@@ -240,7 +248,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
           onPress={() => navigation.navigate('Login')}
           disabled={loading}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Back to sign in</Text>
+          <Text style={styles.footerLink}>{t('verify.backToSignIn')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>

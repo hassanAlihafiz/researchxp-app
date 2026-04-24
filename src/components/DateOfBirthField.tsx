@@ -15,6 +15,28 @@ import { formatDateDisplay } from '../utils/dateFormat';
 const DEFAULT_MIN = new Date(1900, 0, 1);
 const DEFAULT_FALLBACK_DATE = new Date(1995, 5, 15);
 
+export type DateOfBirthLocaleStrings = {
+  tapToChoose: string;
+  clear: string;
+  iosCancel: string;
+  iosDone: string;
+  iosTitle: string;
+  chooseA11y: string;
+  clearA11y: string;
+  closePickerA11y: string;
+};
+
+const DOB_COPY_DEFAULT: DateOfBirthLocaleStrings = {
+  tapToChoose: 'Tap to choose a date',
+  clear: 'Clear',
+  iosCancel: 'Cancel',
+  iosDone: 'Done',
+  iosTitle: 'Date of birth',
+  chooseA11y: 'Choose date of birth',
+  clearA11y: 'Clear date of birth',
+  closePickerA11y: 'Close date picker',
+};
+
 type Props = {
   value: Date | null;
   onChange: (next: Date | null) => void;
@@ -27,6 +49,8 @@ type Props = {
   minDate?: Date;
   maxDate?: Date;
   showClear?: boolean;
+  /** Localized strings for the picker UI (defaults to English). */
+  localeStrings?: Partial<DateOfBirthLocaleStrings>;
 };
 
 /**
@@ -44,8 +68,13 @@ export function DateOfBirthField({
   minDate = DEFAULT_MIN,
   maxDate,
   showClear = true,
+  localeStrings,
 }: Props) {
   const insets = useSafeAreaInsets();
+  const copy = useMemo(
+    () => ({ ...DOB_COPY_DEFAULT, ...localeStrings }),
+    [localeStrings],
+  );
   const [open, setOpen] = useState(false);
   const [iosTemp, setIosTemp] = useState(value ?? DEFAULT_FALLBACK_DATE);
 
@@ -71,10 +100,7 @@ export function DateOfBirthField({
     setOpen(false);
   }, [iosTemp, onChange]);
 
-  const max = useMemo(
-    () => maxDate ?? new Date(),
-    [maxDate, open],
-  );
+  const max = useMemo(() => maxDate ?? new Date(), [maxDate]);
 
   const styles = useMemo(
     () =>
@@ -147,12 +173,12 @@ export function DateOfBirthField({
           onPress={openPicker}
           disabled={disabled}
           accessibilityRole="button"
-          accessibilityLabel="Choose date of birth">
+          accessibilityLabel={copy.chooseA11y}>
           <Text
             style={[styles.dobText, !value && styles.dobPlaceholder]}>
             {value
               ? formatDateDisplay(value)
-              : 'Tap to choose a date'}
+              : copy.tapToChoose}
           </Text>
         </AppPressable>
         {showClear && value ? (
@@ -161,8 +187,8 @@ export function DateOfBirthField({
             onPress={() => onChange(null)}
             hitSlop={8}
             disabled={disabled}
-            accessibilityLabel="Clear date of birth">
-            <Text style={styles.clearDobText}>Clear</Text>
+            accessibilityLabel={copy.clearA11y}>
+            <Text style={styles.clearDobText}>{copy.clear}</Text>
           </AppPressable>
         ) : null}
       </View>
@@ -193,7 +219,7 @@ export function DateOfBirthField({
                 { backgroundColor: 'rgba(0,0,0,0.45)' },
               ]}
               onPress={() => setOpen(false)}
-              accessibilityLabel="Close date picker"
+              accessibilityLabel={copy.closePickerA11y}
             />
             <View
               style={[
@@ -209,15 +235,15 @@ export function DateOfBirthField({
               <View style={styles.modalBar}>
                 <AppPressable onPress={() => setOpen(false)} hitSlop={12}>
                   <Text style={[styles.modalBtn, styles.modalCancel]}>
-                    Cancel
+                    {copy.iosCancel}
                   </Text>
                 </AppPressable>
                 <Text style={{ fontWeight: '700', color: colors.text }}>
-                  Date of birth
+                  {copy.iosTitle}
                 </Text>
                 <AppPressable onPress={confirmIos} hitSlop={12}>
                   <Text style={[styles.modalBtn, styles.modalDone]}>
-                    Done
+                    {copy.iosDone}
                   </Text>
                 </AppPressable>
               </View>

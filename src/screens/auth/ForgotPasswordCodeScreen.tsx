@@ -13,6 +13,7 @@ import { resendForgotPasswordCode } from '../../api/auth';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import type { RootStackParamList } from '../../navigation/types';
+import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 const RESEND_COOLDOWN_SEC = 45;
@@ -21,6 +22,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPasswordCode'>;
 
 export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
   const { colors } = useAppTheme();
+  const { t } = useLocale();
   const email = (route.params?.email ?? '').trim().toLowerCase();
   const [code, setCode] = useState('');
   const [resendLoading, setResendLoading] = useState(false);
@@ -130,7 +132,10 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
   const onContinue = () => {
     const digits = code.replace(/\D/g, '');
     if (digits.length !== 6) {
-      Alert.alert('Invalid code', 'Enter the 6-digit code from your email.');
+      Alert.alert(
+        t('forgotCode.alertInvalidCodeTitle'),
+        t('forgotCode.alertInvalidCodeBody'),
+      );
       return;
     }
     navigation.navigate('ForgotPasswordNew', { email, code: digits });
@@ -144,11 +149,14 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
     try {
       const result = await resendForgotPasswordCode(email);
       if (!result.ok) {
-        Alert.alert('Could not resend', result.message);
+        Alert.alert(t('forgotCode.alertCouldNotResendTitle'), result.message);
         return;
       }
       setResendCooldown(RESEND_COOLDOWN_SEC);
-      Alert.alert('Code sent', 'Check your inbox for a new 6-digit code.');
+      Alert.alert(
+        t('forgotCode.alertCodeSentTitle'),
+        t('forgotCode.alertCodeSentBody'),
+      );
     } finally {
       setResendLoading(false);
     }
@@ -156,22 +164,22 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
 
   return (
     <AuthScreenShell logoWidth={220}>
-      <Text style={styles.title}>Enter code</Text>
+      <Text style={styles.title}>{t('forgotCode.title')}</Text>
       <Text style={styles.subtitle}>
-        We sent a reset code to{' '}
-        <Text style={styles.emailHighlight}>{email}</Text>. Enter it below, then
-        choose a new password.
+        {t('forgotCode.subtitleBefore')}
+        <Text style={styles.emailHighlight}>{email}</Text>
+        {t('forgotCode.subtitleAfter')}
       </Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>Verification code</Text>
+        <Text style={styles.label}>{t('forgotCode.codeLabel')}</Text>
         <TextInput
           style={styles.input}
           value={code}
-          onChangeText={t => setCode(t.replace(/\D/g, '').slice(0, 6))}
+          onChangeText={txt => setCode(txt.replace(/\D/g, '').slice(0, 6))}
           keyboardType="number-pad"
           maxLength={6}
-          placeholder="000000"
+          placeholder={t('forgotCode.codePlaceholder')}
           placeholderTextColor={colors.placeholder}
           editable={!resendLoading}
           autoFocus
@@ -179,7 +187,7 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
       </View>
 
       <AppPressable style={styles.button} onPress={onContinue}>
-        <Text style={styles.buttonText}>Continue</Text>
+        <Text style={styles.buttonText}>{t('forgotCode.continue')}</Text>
       </AppPressable>
 
       <AppPressable
@@ -189,9 +197,11 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
         {resendLoading ? (
           <ActivityIndicator color={colors.primary} />
         ) : resendCooldown > 0 ? (
-          <Text style={styles.secondaryMuted}>Resend code in {resendCooldown}s</Text>
+          <Text style={styles.secondaryMuted}>
+            {t('forgotCode.resendIn', { sec: resendCooldown })}
+          </Text>
         ) : (
-          <Text style={styles.secondaryText}>Resend code</Text>
+          <Text style={styles.secondaryText}>{t('forgotCode.resend')}</Text>
         )}
       </AppPressable>
 
@@ -199,7 +209,7 @@ export default function ForgotPasswordCodeScreen({ navigation, route }: Props) {
         <AppPressable
           onPress={() => navigation.navigate('ForgotPasswordEmail')}
           hitSlop={12}>
-          <Text style={styles.footerLink}>Use a different email</Text>
+          <Text style={styles.footerLink}>{t('forgotCode.differentEmail')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>
