@@ -158,6 +158,13 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
     try {
       const result = await verifyEmailWithCode(email, digits);
       if (!result.ok) {
+        if (result.accountDisabled) {
+          Alert.alert(
+            t('login.alertAccountDisabledTitle'),
+            result.message || t('login.alertAccountDisabledBody'),
+          );
+          return;
+        }
         Alert.alert(t('verify.alertVerificationFailedTitle'), result.message);
         return;
       }

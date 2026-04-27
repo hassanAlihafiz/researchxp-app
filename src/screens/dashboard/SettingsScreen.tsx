@@ -29,8 +29,17 @@ type Props = DrawerScreenProps<MainDrawerParamList, 'Settings'>;
 
 const LANGUAGE_LABEL_KEYS: Record<AppLanguage, string> = {
   en: 'settings.languageEnglish',
-  fr: 'settings.languageFrench',
   es: 'settings.languageSpanish',
+  fr: 'settings.languageFrench',
+  de: 'settings.languageGerman',
+  pt: 'settings.languagePortuguese',
+  zh: 'settings.languageMandarin',
+  ar: 'settings.languageArabic',
+  ja: 'settings.languageJapanese',
+  ko: 'settings.languageKorean',
+  tr: 'settings.languageTurkish',
+  it: 'settings.languageItalian',
+  hi: 'settings.languageHindi',
 };
 
 export default function SettingsScreen(_props: Props) {

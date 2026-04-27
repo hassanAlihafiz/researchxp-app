@@ -51,6 +51,8 @@ type Props = {
   showClear?: boolean;
   /** Localized strings for the picker UI (defaults to English). */
   localeStrings?: Partial<DateOfBirthLocaleStrings>;
+  /** When the user opens the date field (e.g. scroll row to center). */
+  onFieldPress?: () => void;
 };
 
 /**
@@ -69,6 +71,7 @@ export function DateOfBirthField({
   maxDate,
   showClear = true,
   localeStrings,
+  onFieldPress,
 }: Props) {
   const insets = useSafeAreaInsets();
   const copy = useMemo(
@@ -79,9 +82,10 @@ export function DateOfBirthField({
   const [iosTemp, setIosTemp] = useState(value ?? DEFAULT_FALLBACK_DATE);
 
   const openPicker = useCallback(() => {
+    onFieldPress?.();
     setIosTemp(value ?? DEFAULT_FALLBACK_DATE);
     setOpen(true);
-  }, [value]);
+  }, [value, onFieldPress]);
 
   const onAndroidValueChange = useCallback(
     (_event: unknown, date: Date) => {

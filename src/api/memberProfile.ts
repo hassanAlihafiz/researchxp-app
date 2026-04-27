@@ -19,10 +19,11 @@ async function readJson(
 
 /**
  * Fetches the current member profile. Requires a valid Bearer token.
+ * Returns `'account_disabled'` if the server suspended the member (403).
  */
 export async function fetchMyProfile(
   token: string,
-): Promise<RegisteredAppUser | null> {
+): Promise<RegisteredAppUser | 'account_disabled' | null> {
   appLog('api', 'GET /api/members/me', { token: tokenPreview(token) });
   try {
     const res = await fetch(`${API_BASE_URL}/api/members/me`, {
@@ -32,6 +33,9 @@ export async function fetchMyProfile(
       },
     });
     const obj = await readJson(res);
+    if (res.status === 403 && obj && obj.error === 'account_disabled') {
+      return 'account_disabled';
+    }
     if (
       res.ok &&
       obj &&
@@ -55,6 +59,13 @@ export type UpdateMyProfileInput = {
   education: string | null;
   skills: string[];
   hobbies: string[];
+  gender: string | null;
+  ethnicity: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  zip_code: string | null;
+  marital_status: string | null;
 };
 
 /**
@@ -65,7 +76,8 @@ export async function updateMyProfile(
   token: string,
   body: UpdateMyProfileInput,
 ): Promise<
-  { ok: true; user: RegisteredAppUser } | { ok: false; message: string; status: number }
+  | { ok: true; user: RegisteredAppUser }
+  | { ok: false; message: string; status: number; accountDisabled?: boolean }
 > {
   appLog('api', 'PATCH /api/members/me (password omitted)', {
     token: tokenPreview(token),
@@ -85,9 +97,27 @@ export async function updateMyProfile(
         education: body.education,
         skills: body.skills,
         hobbies: body.hobbies,
+        gender: body.gender,
+        ethnicity: body.ethnicity,
+        country: body.country,
+        state: body.state,
+        city: body.city,
+        zip_code: body.zip_code,
+        marital_status: body.marital_status,
       }),
     });
     const obj = await readJson(res);
+    if (res.status === 403 && obj && obj.error === 'account_disabled') {
+      return {
+        ok: false,
+        message:
+          typeof obj.message === 'string'
+            ? obj.message
+            : 'Your account has been suspended.',
+        status: 403,
+        accountDisabled: true,
+      };
+    }
     if (res.ok && obj?.user && typeof obj.user === 'object') {
       return { ok: true, user: obj.user as RegisteredAppUser };
     }

@@ -1,10 +1,13 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import type { RefObject } from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
   StyleSheet,
   View,
+  type LayoutChangeEvent,
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
@@ -22,15 +25,34 @@ type Props = {
   children: React.ReactNode;
   logoWidth?: number;
   contentContainerStyle?: StyleProp<ViewStyle>;
+  /** For scroll-to-focused-field (e.g. Register). */
+  scrollViewRef?: RefObject<ScrollView | null>;
+  onScrollViewLayout?: (event: LayoutChangeEvent) => void;
 };
 
 export function AuthScreenShell({
   children,
   logoWidth = 220,
   contentContainerStyle,
+  scrollViewRef,
+  onScrollViewLayout,
 }: Props) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
+  const [keyboardOpen, setKeyboardOpen] = useState(false);
+
+  useEffect(() => {
+    const showEvt =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const show = Keyboard.addListener(showEvt, () => setKeyboardOpen(true));
+    const hide = Keyboard.addListener(hideEvt, () => setKeyboardOpen(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
 
   const styles = useMemo(
     () =>
@@ -40,15 +62,22 @@ export function AuthScreenShell({
           backgroundColor: colors.background,
         },
         brand: {
-          flex: BRAND_FLEX,
+          flex: keyboardOpen ? 0 : BRAND_FLEX,
           justifyContent: 'center',
           alignItems: 'center',
-          paddingTop: insets.top + 4,
+          paddingTop: keyboardOpen ? 0 : insets.top + 4,
           paddingHorizontal: 24,
+          minHeight: 0,
+          overflow: 'hidden',
+          opacity: keyboardOpen ? 0 : 1,
+          ...(keyboardOpen
+            ? { height: 0, paddingHorizontal: 0 }
+            : {}),
         },
         lower: {
-          flex: CARD_FLEX,
-          minHeight: 260,
+          flex: keyboardOpen ? 1 : CARD_FLEX,
+          minHeight: keyboardOpen ? 0 : 260,
+          paddingTop: keyboardOpen ? insets.top : 0,
         },
         keyboard: {
           flex: 1,
@@ -84,7 +113,7 @@ export function AuthScreenShell({
           flexGrow: 1,
         },
       }),
-    [colors, insets.top, insets.bottom],
+    [colors, insets.top, insets.bottom, keyboardOpen],
   );
 
   return (
@@ -98,6 +127,8 @@ export function AuthScreenShell({
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={styles.card}>
             <ScrollView
+              ref={scrollViewRef}
+              onLayout={onScrollViewLayout}
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
               automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}

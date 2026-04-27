@@ -152,6 +152,14 @@ const LoginScreen = ({ navigation }: Props) => {
         return;
       }
 
+      if (result.accountDisabled) {
+        Alert.alert(
+          t('login.alertAccountDisabledTitle'),
+          result.message || t('login.alertAccountDisabledBody'),
+        );
+        return;
+      }
+
       if (result.needsVerification) {
         const resend = await resendVerificationEmail(trimmedEmail);
         if (!resend.ok) {
