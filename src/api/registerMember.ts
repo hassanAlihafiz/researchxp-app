@@ -10,6 +10,14 @@ export type RegisterMemberPayload = {
   education?: string | null;
   skills?: string[];
   hobbies?: string[];
+  gender: string;
+  ethnicity: string;
+  country: string;
+  state: string;
+  city: string;
+  /** Postal / ZIP code */
+  zip_code: string;
+  marital_status: string;
 };
 
 export type RegisteredAppUser = {
@@ -22,6 +30,13 @@ export type RegisteredAppUser = {
   education: string | null;
   skills: unknown;
   hobbies: unknown;
+  gender: string | null;
+  ethnicity: string | null;
+  country: string | null;
+  state: string | null;
+  city: string | null;
+  zip_code: string | null;
+  marital_status: string | null;
   created_at: string;
 };
 
@@ -38,6 +53,13 @@ export async function registerMember(
     password: payload.password,
     skills: payload.skills ?? [],
     hobbies: payload.hobbies ?? [],
+    gender: payload.gender.trim(),
+    ethnicity: payload.ethnicity.trim(),
+    country: payload.country.trim(),
+    state: payload.state.trim(),
+    city: payload.city.trim(),
+    zip_code: payload.zip_code.trim(),
+    marital_status: payload.marital_status.trim(),
   };
 
   const dob = payload.dob?.trim();

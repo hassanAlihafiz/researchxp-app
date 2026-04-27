@@ -8,6 +8,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppPressable } from '../components/AppPressable';
+import { ResearchLogo } from '../components/ResearchLogo';
 import { useAuth } from '../auth/AuthContext';
 import { useLocale } from '../locale';
 import { resetToLogin } from './navigationRef';
@@ -63,6 +64,12 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
           fontWeight: '600',
           color: colors.text,
         },
+        logoBlock: {
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          paddingBottom: 24,
+          alignItems: 'center' as const,
+        },
       }),
     [colors, insets.bottom],
   );
@@ -74,6 +81,9 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
         style={styles.scroll}
         contentContainerStyle={{ paddingTop: insets.top + 4 }}
         showsVerticalScrollIndicator={false}>
+        <View style={styles.logoBlock}>
+          <ResearchLogo width={200} />
+        </View>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
       <View style={styles.footer}>

@@ -4,11 +4,11 @@ import type { RegisteredAppUser } from './registerMember';
 
 export type LoginResult =
   | { ok: true; user: RegisteredAppUser; token: string }
-  | { ok: false; message: string; needsVerification?: boolean };
+  | { ok: false; message: string; needsVerification?: boolean; accountDisabled?: boolean };
 
 export type VerifyEmailResult =
   | { ok: true; user: RegisteredAppUser; token: string }
-  | { ok: false; message: string };
+  | { ok: false; message: string; accountDisabled?: boolean };
 
 export type ResendVerificationResult =
   | { ok: true }
@@ -66,6 +66,16 @@ export async function loginWithPassword(
         needsVerification: true,
       };
     }
+    if (res.status === 403 && obj?.error === 'account_disabled') {
+      return {
+        ok: false,
+        message:
+          typeof obj.message === 'string'
+            ? obj.message
+            : 'Your account has been suspended.',
+        accountDisabled: true,
+      };
+    }
     const errMsg =
       obj && typeof obj.error === 'string'
         ? obj.error
@@ -110,6 +120,16 @@ export async function verifyEmailWithCode(
         ok: true,
         user: obj.user as RegisteredAppUser,
         token: obj.token,
+      };
+    }
+    if (res.status === 403 && obj?.error === 'account_disabled') {
+      return {
+        ok: false,
+        message:
+          typeof obj.message === 'string'
+            ? obj.message
+            : 'Your account has been suspended.',
+        accountDisabled: true,
       };
     }
     const errMsg =

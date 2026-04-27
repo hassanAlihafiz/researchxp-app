@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { RefObject } from 'react';
 import { useLocale } from '../../locale';
 import {
   ActivityIndicator,
   Alert,
+  Keyboard,
+  type KeyboardEvent,
   KeyboardAvoidingView,
   Platform,
+  type LayoutChangeEvent,
   RefreshControl,
   ScrollView,
   StyleSheet,
@@ -21,7 +25,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { deleteMyAccount, fetchMyProfile, updateMyProfile } from '../../api/memberProfile';
 import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
+import { SelectField } from '../../components/SelectField';
 import { DateOfBirthField } from '../../components/DateOfBirthField';
+import {
+  ETHNICITY_OPTION_VALUES,
+  GENDER_OPTION_VALUES,
+  MARITAL_OPTION_VALUES,
+} from '../../constants/demographicSelectOptions';
+import countryNames from '../../data/countryNames.json';
 import { resetToLogin } from '../../navigation/navigationRef';
 import type { MainTabParamList } from '../../navigation/types';
 import {
@@ -34,6 +45,12 @@ import {
   parseIsoDateToLocal,
   toIsoDateString,
 } from '../../utils/dateFormat';
+import { scrollFieldToCenter } from '../../utils/scrollFieldToCenter';
+import {
+  displayEthnicity,
+  displayGender,
+  displayMarital,
+} from '../../utils/demographicsDisplay';
 import type { RegisteredAppUser } from '../../api/registerMember';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Profile'>;
@@ -105,6 +122,36 @@ export default function ProfileScreen(_props: Props) {
       clearA11y: t('dateOfBirth.clearA11y'),
       closePickerA11y: t('dateOfBirth.closePickerA11y'),
     }),
+    [t],
+  );
+
+  const countryOptions = useMemo(
+    () =>
+      (countryNames as string[]).map(name => ({ value: name, label: name })),
+    [],
+  );
+  const genderOptions = useMemo(
+    () =>
+      GENDER_OPTION_VALUES.map(v => ({
+        value: v,
+        label: t(`demographics.gender.${v}`),
+      })),
+    [t],
+  );
+  const ethnicityOptions = useMemo(
+    () =>
+      ETHNICITY_OPTION_VALUES.map(v => ({
+        value: v,
+        label: t(`demographics.ethnicity.${v}`),
+      })),
+    [t],
+  );
+  const maritalOptions = useMemo(
+    () =>
+      MARITAL_OPTION_VALUES.map(v => ({
+        value: v,
+        label: t(`demographics.marital.${v}`),
+      })),
     [t],
   );
   const formStyles = useMemo(
@@ -212,6 +259,13 @@ export default function ProfileScreen(_props: Props) {
 
   const [name, setName] = useState('');
   const [education, setEducation] = useState('');
+  const [gender, setGender] = useState('');
+  const [ethnicity, setEthnicity] = useState('');
+  const [country, setCountry] = useState('');
+  const [stateRegion, setStateRegion] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [maritalStatus, setMaritalStatus] = useState('');
   const [skillsText, setSkillsText] = useState('');
   const [hobbiesText, setHobbiesText] = useState('');
   const [dobDate, setDobDate] = useState<Date | null>(null);
@@ -221,9 +275,124 @@ export default function ProfileScreen(_props: Props) {
   const [deletingAccount, setDeletingAccount] = useState(false);
   const maxDob = useMemo(() => new Date(), []);
 
+  const scrollRef = useRef<ScrollView>(null);
+  const viewportH = useRef(0);
+  const kbHeightRef = useRef(0);
+  const activeFieldRef = useRef<RefObject<View | null> | null>(null);
+  const nameFieldRef = useRef<View>(null);
+  const dobFieldRef = useRef<View>(null);
+  const educationFieldRef = useRef<View>(null);
+  const demographicsFieldRef = useRef<View>(null);
+  const skillsFieldRef = useRef<View>(null);
+  const hobbiesFieldRef = useRef<View>(null);
+
+  const recenterActive = useCallback(() => {
+    if (!isEditing) {
+      return;
+    }
+    const fieldRef = activeFieldRef.current;
+    if (!fieldRef?.current) {
+      return;
+    }
+    const sv = scrollRef.current;
+    if (!sv) {
+      return;
+    }
+    (sv as unknown as View).measure((_x, _y, _w, h) => {
+      if (h > 0) {
+        viewportH.current = h;
+      }
+      const vh = viewportH.current;
+      const hasKb = kbHeightRef.current > 0;
+      const obscured = hasKb
+        ? Math.min(kbHeightRef.current, vh * 0.7)
+        : 0;
+      scrollFieldToCenter(scrollRef, fieldRef, vh, {
+        obscuredBottom: obscured,
+        centerFraction: hasKb ? 0.38 : 0.5,
+      });
+    });
+  }, [isEditing]);
+
+  useEffect(() => {
+    const showEvt =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvt =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const onShow = (e: KeyboardEvent) => {
+      kbHeightRef.current = e.endCoordinates.height;
+      if (!isEditing) {
+        return;
+      }
+      setTimeout(() => {
+        recenterActive();
+      }, 64);
+    };
+    const onHide = () => {
+      kbHeightRef.current = 0;
+    };
+    const show = Keyboard.addListener(showEvt, onShow);
+    const hide = Keyboard.addListener(hideEvt, onHide);
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, [isEditing, recenterActive]);
+
+  const onScrollViewLayout = useCallback(
+    (e: LayoutChangeEvent) => {
+      viewportH.current = e.nativeEvent.layout.height;
+      if (kbHeightRef.current > 0 && isEditing) {
+        setTimeout(() => {
+          recenterActive();
+        }, 32);
+      }
+    },
+    [isEditing, recenterActive],
+  );
+
+  const scheduleCenterField = useCallback(
+    (fieldRef: RefObject<View | null>) => {
+      if (!isEditing) {
+        return;
+      }
+      activeFieldRef.current = fieldRef;
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const sv = scrollRef.current;
+          if (!sv) {
+            return;
+          }
+          (sv as unknown as View).measure((_x, _y, _w, h) => {
+            if (h > 0) {
+              viewportH.current = h;
+            }
+            const vh = viewportH.current;
+            const hasKb = kbHeightRef.current > 0;
+            const obscured = hasKb
+              ? Math.min(kbHeightRef.current, vh * 0.7)
+              : 0;
+            scrollFieldToCenter(scrollRef, fieldRef, vh, {
+              obscuredBottom: obscured,
+              centerFraction: hasKb ? 0.38 : 0.5,
+            });
+          });
+        });
+      });
+    },
+    [isEditing],
+  );
+
   const hydrateFormFromUser = useCallback((u: RegisteredAppUser) => {
     setName(u.name);
     setEducation(u.education?.trim() ? u.education : '');
+    setGender(u.gender?.trim() ? u.gender : '');
+    setEthnicity(u.ethnicity?.trim() ? u.ethnicity : '');
+    setCountry(u.country?.trim() ? u.country : '');
+    setStateRegion(u.state?.trim() ? u.state : '');
+    setCity(u.city?.trim() ? u.city : '');
+    setZipCode(u.zip_code?.trim() ? u.zip_code : '');
+    setMaritalStatus(u.marital_status?.trim() ? u.marital_status : '');
     setSkillsText(toCommaList(u.skills));
     setHobbiesText(toCommaList(u.hobbies));
     setDobDate(parseIsoDateToLocal(u.date_of_birth));
@@ -257,13 +426,18 @@ export default function ProfileScreen(_props: Props) {
     setRefreshing(true);
     try {
       const next = await fetchMyProfile(token);
+      if (next === 'account_disabled') {
+        await signOut();
+        resetToLogin();
+        return;
+      }
       if (next) {
         await updateSessionUser(next);
       }
     } finally {
       setRefreshing(false);
     }
-  }, [token, updateSessionUser]);
+  }, [token, updateSessionUser, signOut]);
 
   const onSave = async () => {
     if (!token) {
@@ -281,6 +455,20 @@ export default function ProfileScreen(_props: Props) {
       );
       return;
     }
+    const g = gender.trim();
+    const eth = ethnicity.trim();
+    const c = country.trim();
+    const st = stateRegion.trim();
+    const ci = city.trim();
+    const z = zipCode.trim();
+    const m = maritalStatus.trim();
+    if (!g || !eth || !c || !st || !ci || !z || !m) {
+      Alert.alert(
+        t('register.alertDemographicsTitle'),
+        t('register.alertDemographicsBody'),
+      );
+      return;
+    }
     setSaving(true);
     try {
       const result = await updateMyProfile(token, {
@@ -289,8 +477,20 @@ export default function ProfileScreen(_props: Props) {
         education: education.trim() || null,
         skills: fromCommaList(skillsText),
         hobbies: fromCommaList(hobbiesText),
+        gender: g,
+        ethnicity: eth,
+        country: c,
+        state: st,
+        city: ci,
+        zip_code: z,
+        marital_status: m,
       });
       if (!result.ok) {
+        if (result.status === 403 && result.accountDisabled) {
+          await signOut();
+          resetToLogin();
+          return;
+        }
         Alert.alert(
           t('profile.alertCouldNotSaveTitle'),
           result.status === 401
@@ -395,7 +595,7 @@ export default function ProfileScreen(_props: Props) {
     insets.bottom +
     tabBarHeight +
     24 +
-    (isEditing ? 160 : 0);
+    (isEditing ? 200 : 0);
 
   return (
     <KeyboardAvoidingView
@@ -403,6 +603,8 @@ export default function ProfileScreen(_props: Props) {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={headerHeight}>
       <ScrollView
+        ref={scrollRef}
+        onLayout={onScrollViewLayout}
         style={baseStyles.root}
         contentContainerStyle={{
           paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
@@ -475,6 +677,48 @@ export default function ProfileScreen(_props: Props) {
               {user.education?.trim() ? user.education : t('common.emDash')}
             </Text>
             <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.gender')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {displayGender(user.gender, t, t('common.emDash'))}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.ethnicity')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {displayEthnicity(user.ethnicity, t, t('common.emDash'))}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.country')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {user.country?.trim() ? user.country : t('common.emDash')}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.state')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {user.state?.trim() ? user.state : t('common.emDash')}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.city')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {user.city?.trim() ? user.city : t('common.emDash')}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.zipCode')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {user.zip_code?.trim() ? user.zip_code : t('common.emDash')}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+              {t('profile.maritalStatus')}
+            </Text>
+            <Text style={baseStyles.fieldValue}>
+              {displayMarital(user.marital_status, t, t('common.emDash'))}
+            </Text>
+            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
               {t('profile.skills')}
             </Text>
             <Text style={baseStyles.fieldValue}>
@@ -506,7 +750,10 @@ export default function ProfileScreen(_props: Props) {
           <Text style={[baseStyles.paragraph, { marginBottom: 16 }]}>
             {t('profile.editIntro')}
           </Text>
-          <View style={formStyles.field}>
+          <View
+            ref={nameFieldRef}
+            collapsable={false}
+            style={formStyles.field}>
             <Text style={formStyles.label}>{t('profile.fullName')}</Text>
             <TextInput
               style={formStyles.input}
@@ -516,23 +763,30 @@ export default function ProfileScreen(_props: Props) {
               placeholder={t('profile.namePlaceholder')}
               placeholderTextColor={colors.placeholder}
               editable={canEdit && !saving}
+              onFocus={() => scheduleCenterField(nameFieldRef)}
             />
           </View>
 
-          <DateOfBirthField
-            value={dobDate}
-            onChange={setDobDate}
-            colors={colors}
-            colorScheme={colorScheme}
-            label={t('profile.dobLabel')}
-            hint={t('profile.dobHint')}
-            localeStrings={dobLocaleStrings}
-            disabled={!canEdit || saving}
-            minDate={MIN_DOB}
-            maxDate={maxDob}
-          />
+          <View ref={dobFieldRef} collapsable={false}>
+            <DateOfBirthField
+              value={dobDate}
+              onChange={setDobDate}
+              colors={colors}
+              colorScheme={colorScheme}
+              label={t('profile.dobLabel')}
+              hint={t('profile.dobHint')}
+              localeStrings={dobLocaleStrings}
+              disabled={!canEdit || saving}
+              minDate={MIN_DOB}
+              maxDate={maxDob}
+              onFieldPress={() => scheduleCenterField(dobFieldRef)}
+            />
+          </View>
 
-          <View style={formStyles.field}>
+          <View
+            ref={educationFieldRef}
+            collapsable={false}
+            style={formStyles.field}>
             <Text style={formStyles.label}>{t('profile.educationOptional')}</Text>
             <TextInput
               style={formStyles.input}
@@ -541,10 +795,118 @@ export default function ProfileScreen(_props: Props) {
               placeholder={t('profile.educationPlaceholder')}
               placeholderTextColor={colors.placeholder}
               editable={canEdit && !saving}
+              onFocus={() => scheduleCenterField(educationFieldRef)}
             />
           </View>
 
-          <View style={formStyles.field}>
+          <View ref={demographicsFieldRef} collapsable={false}>
+            <View style={formStyles.field}>
+              <SelectField
+                label={t('profile.gender')}
+                value={gender}
+                placeholder={t('demographics.tapToSelect')}
+                options={genderOptions}
+                onChange={setGender}
+                colors={colors}
+                disabled={!canEdit || saving}
+                modalTitle={t('demographics.pickGender')}
+                closeA11yLabel={t('demographics.done')}
+                noResultsLabel={t('demographics.noMatches')}
+                onOpen={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <SelectField
+                label={t('profile.ethnicity')}
+                value={ethnicity}
+                placeholder={t('demographics.tapToSelect')}
+                options={ethnicityOptions}
+                onChange={setEthnicity}
+                colors={colors}
+                disabled={!canEdit || saving}
+                modalTitle={t('demographics.pickEthnicity')}
+                closeA11yLabel={t('demographics.done')}
+                noResultsLabel={t('demographics.noMatches')}
+                onOpen={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <SelectField
+                label={t('profile.country')}
+                value={country}
+                placeholder={t('demographics.tapToSelect')}
+                options={countryOptions}
+                onChange={setCountry}
+                colors={colors}
+                disabled={!canEdit || saving}
+                searchable
+                searchPlaceholder={t('demographics.searchCountries')}
+                modalTitle={t('demographics.pickCountry')}
+                closeA11yLabel={t('demographics.done')}
+                noResultsLabel={t('demographics.noMatches')}
+                onOpen={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <Text style={formStyles.label}>{t('profile.state')}</Text>
+              <TextInput
+                style={formStyles.input}
+                value={stateRegion}
+                onChangeText={setStateRegion}
+                autoCapitalize="words"
+                placeholder={t('register.statePlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                editable={canEdit && !saving}
+                onFocus={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <Text style={formStyles.label}>{t('profile.city')}</Text>
+              <TextInput
+                style={formStyles.input}
+                value={city}
+                onChangeText={setCity}
+                autoCapitalize="words"
+                placeholder={t('register.cityPlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                editable={canEdit && !saving}
+                onFocus={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <Text style={formStyles.label}>{t('profile.zipCode')}</Text>
+              <TextInput
+                style={formStyles.input}
+                value={zipCode}
+                onChangeText={setZipCode}
+                autoCapitalize="characters"
+                placeholder={t('register.zipCodePlaceholder')}
+                placeholderTextColor={colors.placeholder}
+                editable={canEdit && !saving}
+                onFocus={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+            <View style={formStyles.field}>
+              <SelectField
+                label={t('profile.maritalStatus')}
+                value={maritalStatus}
+                placeholder={t('demographics.tapToSelect')}
+                options={maritalOptions}
+                onChange={setMaritalStatus}
+                colors={colors}
+                disabled={!canEdit || saving}
+                modalTitle={t('demographics.pickMarital')}
+                closeA11yLabel={t('demographics.done')}
+                noResultsLabel={t('demographics.noMatches')}
+                onOpen={() => scheduleCenterField(demographicsFieldRef)}
+              />
+            </View>
+          </View>
+
+          <View
+            ref={skillsFieldRef}
+            collapsable={false}
+            style={formStyles.field}>
             <Text style={formStyles.label}>{t('profile.skills')}</Text>
             <TextInput
               style={[formStyles.input, formStyles.inputMultiline]}
@@ -554,11 +916,15 @@ export default function ProfileScreen(_props: Props) {
               placeholderTextColor={colors.placeholder}
               multiline
               editable={canEdit && !saving}
+              onFocus={() => scheduleCenterField(skillsFieldRef)}
             />
             <Text style={formStyles.hint}>{t('profile.skillsFieldHint')}</Text>
           </View>
 
-          <View style={formStyles.field}>
+          <View
+            ref={hobbiesFieldRef}
+            collapsable={false}
+            style={formStyles.field}>
             <Text style={formStyles.label}>{t('profile.hobbies')}</Text>
             <TextInput
               style={[formStyles.input, formStyles.inputMultiline]}
@@ -568,6 +934,7 @@ export default function ProfileScreen(_props: Props) {
               placeholderTextColor={colors.placeholder}
               multiline
               editable={canEdit && !saving}
+              onFocus={() => scheduleCenterField(hobbiesFieldRef)}
             />
           </View>
 

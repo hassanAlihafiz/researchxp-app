@@ -63,6 +63,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /** Prevents a slow initial profile fetch from writing after sign-out / account deletion. */
   const activeTokenRef = useRef<string | null>(null);
 
+  const signOut = useCallback(async () => {
+    appLog('auth', 'signOut (clearing user session storage)');
+    activeTokenRef.current = null;
+    await AsyncStorage.removeMany([...USER_RELATED_ASYNC_STORAGE_KEYS]);
+    setEmail(null);
+    setToken(null);
+    setUser(null);
+    setIsSignedIn(false);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -86,7 +96,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const tokenAtFetchStart = parsed.token;
               void fetchMyProfile(parsed.token)
                 .then(fetched => {
-                  if (cancelled || !fetched) {
+                  if (cancelled) {
+                    return;
+                  }
+                  if (fetched === 'account_disabled') {
+                    appLog('auth', 'session cleared: account suspended on server');
+                    void signOut();
+                    return;
+                  }
+                  if (!fetched) {
                     return;
                   }
                   if (activeTokenRef.current !== tokenAtFetchStart) {
@@ -124,7 +142,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [signOut]);
 
   const signInWithSession = useCallback(async (session: AuthSession) => {
     appLog('auth', 'signInWithSession', {
@@ -150,16 +168,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     [email, token],
   );
-
-  const signOut = useCallback(async () => {
-    appLog('auth', 'signOut (clearing user session storage)');
-    activeTokenRef.current = null;
-    await AsyncStorage.removeMany([...USER_RELATED_ASYNC_STORAGE_KEYS]);
-    setEmail(null);
-    setToken(null);
-    setUser(null);
-    setIsSignedIn(false);
-  }, []);
 
   const value = useMemo(
     () => ({

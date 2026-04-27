@@ -12,6 +12,8 @@ type Props = {
   editable?: boolean;
   /** Accessibility label for the visibility toggle (optional). */
   testID?: string;
+  /** Called when the text field is focused (e.g. scroll field to center). */
+  onInputFocus?: () => void;
 };
 
 export function PasswordField({
@@ -20,6 +22,7 @@ export function PasswordField({
   placeholder,
   colors,
   editable = true,
+  onInputFocus,
 }: Props) {
   const [visible, setVisible] = useState(false);
 
@@ -59,6 +62,7 @@ export function PasswordField({
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
+        onFocus={onInputFocus}
         secureTextEntry={!visible}
         placeholder={placeholder}
         placeholderTextColor={colors.placeholder}
