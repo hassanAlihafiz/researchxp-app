@@ -39,6 +39,7 @@ import {
   createDashboardStyles,
   DASHBOARD_SCROLL_PADDING_TOP,
 } from '../../theme/dashboardStyles';
+import { createHomeStyles } from './createHomeStyles';
 import { useAppTheme } from '../../theme/ThemeContext';
 import {
   formatIsoDateStringForDisplay,
@@ -109,7 +110,11 @@ export default function ProfileScreen(_props: Props) {
   const { email, user, token, updateSessionUser, signOut } = useAuth();
   const { colors, colorScheme } = useAppTheme();
   const { t } = useLocale();
-  const baseStyles = useMemo(() => createDashboardStyles(colors), [colors]);
+  const dash = useMemo(() => createDashboardStyles(colors), [colors]);
+  const ds = useMemo(
+    () => createHomeStyles(colors, colorScheme),
+    [colors, colorScheme],
+  );
 
   const dobLocaleStrings = useMemo(
     () => ({
@@ -564,11 +569,11 @@ export default function ProfileScreen(_props: Props) {
 
   const dataPrivacyContent = (
     <>
-      <Text style={[baseStyles.overline, formStyles.deleteSection]}>
+      <Text style={[ds.sectionTitle, formStyles.deleteSection]}>
         {t('profile.dataPrivacyOverline')}
       </Text>
-      <View style={baseStyles.elevatedBlock}>
-        <Text style={baseStyles.paragraph}>{t('profile.dataPrivacyBody')}</Text>
+      <View style={ds.surfaceCard}>
+        <Text style={dash.paragraph}>{t('profile.dataPrivacyBody')}</Text>
         <AppPressable
           style={[
             formStyles.deleteAccountButton,
@@ -605,11 +610,14 @@ export default function ProfileScreen(_props: Props) {
       <ScrollView
         ref={scrollRef}
         onLayout={onScrollViewLayout}
-        style={baseStyles.root}
-        contentContainerStyle={{
-          paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
-          paddingBottom: scrollBottomPad,
-        }}
+        style={ds.scrollRoot}
+        contentContainerStyle={[
+          ds.scrollContent,
+          {
+            paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
+            paddingBottom: scrollBottomPad,
+          },
+        ]}
         keyboardShouldPersistTaps="handled"
         automaticallyAdjustKeyboardInsets={Platform.OS === 'ios'}
         showsVerticalScrollIndicator={false}
@@ -621,34 +629,34 @@ export default function ProfileScreen(_props: Props) {
             tintColor={colors.primary}
           />
         }>
-      <Text style={baseStyles.screenTitle}>{t('profile.screenTitle')}</Text>
-      {/* <Text style={baseStyles.screenLead}>
+      <Text style={ds.sectionTitle}>{t('profile.screenTitle')}</Text>
+      {/* <Text style={dash.screenLead}>
         Your ResearchXP account. Use Edit details to change your profile. Email
         is shown for reference and cannot be changed in the app.
       </Text> */}
 
-      <Text style={baseStyles.overline}>{t('profile.accountOverline')}</Text>
-      <View style={baseStyles.elevatedBlock}>
-        <Text style={baseStyles.fieldLabel}>{t('common.email')}</Text>
-        <Text style={[baseStyles.fieldValue, formStyles.emailReadonly]}>
+      <Text style={ds.sectionTitle}>{t('profile.accountOverline')}</Text>
+      <View style={ds.surfaceCard}>
+        <Text style={dash.fieldLabel}>{t('common.email')}</Text>
+        <Text style={[dash.fieldValue, formStyles.emailReadonly]}>
           {displayEmail}
         </Text>
-        <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+        <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
           {t('profile.verificationStatus')}
         </Text>
-        <Text style={baseStyles.fieldValue}>{verification}</Text>
-        <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+        <Text style={dash.fieldValue}>{verification}</Text>
+        <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
           {t('profile.memberSince')}
         </Text>
-        <Text style={baseStyles.fieldValue}>
+        <Text style={dash.fieldValue}>
           {user ? formatMemberSince(user.created_at) : t('common.emDash')}
         </Text>
       </View>
 
       {!user && token ? (
-        <View style={baseStyles.elevatedBlock}>
+        <View style={ds.surfaceCard}>
           <ActivityIndicator color={colors.primary} style={{ marginBottom: 10 }} />
-          <Text style={baseStyles.paragraph}>
+          <Text style={dash.paragraph}>
             {refreshing
               ? t('profile.loadingRefreshing')
               : t('profile.loadingProfile')}
@@ -660,74 +668,74 @@ export default function ProfileScreen(_props: Props) {
 
       {user && !isEditing ? (
         <>
-          <Text style={baseStyles.overline}>{t('profile.yourDetails')}</Text>
-          <View style={baseStyles.elevatedBlock}>
-            <Text style={baseStyles.fieldLabel}>{t('profile.fullName')}</Text>
-            <Text style={baseStyles.fieldValue}>{user.name}</Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+          <Text style={ds.sectionTitle}>{t('profile.yourDetails')}</Text>
+          <View style={ds.surfaceCard}>
+            <Text style={dash.fieldLabel}>{t('profile.fullName')}</Text>
+            <Text style={dash.fieldValue}>{user.name}</Text>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.dateOfBirth')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {formatIsoDateStringForDisplay(user.date_of_birth)}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.education')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {user.education?.trim() ? user.education : t('common.emDash')}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.gender')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {displayGender(user.gender, t, t('common.emDash'))}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.ethnicity')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {displayEthnicity(user.ethnicity, t, t('common.emDash'))}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.country')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {user.country?.trim() ? user.country : t('common.emDash')}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.state')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {user.state?.trim() ? user.state : t('common.emDash')}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.city')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {user.city?.trim() ? user.city : t('common.emDash')}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.zipCode')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {user.zip_code?.trim() ? user.zip_code : t('common.emDash')}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.maritalStatus')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {displayMarital(user.marital_status, t, t('common.emDash'))}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.skills')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {displayDetailList(user.skills)}
             </Text>
-            <Text style={[baseStyles.fieldLabel, { marginTop: 16 }]}>
+            <Text style={[dash.fieldLabel, { marginTop: 16 }]}>
               {t('profile.hobbies')}
             </Text>
-            <Text style={baseStyles.fieldValue}>
+            <Text style={dash.fieldValue}>
               {displayDetailList(user.hobbies)}
             </Text>
           </View>
@@ -746,8 +754,8 @@ export default function ProfileScreen(_props: Props) {
 
       {user && isEditing ? (
         <>
-          <Text style={baseStyles.overline}>{t('profile.editOverline')}</Text>
-          <Text style={[baseStyles.paragraph, { marginBottom: 16 }]}>
+          <Text style={ds.sectionTitle}>{t('profile.editOverline')}</Text>
+          <Text style={[dash.paragraph, { marginBottom: 16 }]}>
             {t('profile.editIntro')}
           </Text>
           <View
@@ -967,7 +975,7 @@ export default function ProfileScreen(_props: Props) {
       ) : null}
 
       {showLegacyHint ? (
-        <Text style={baseStyles.hint}>
+        <Text style={dash.hint}>
           {token ? t('profile.legacyHintToken') : t('profile.legacyHintNoToken')}
         </Text>
       ) : null}

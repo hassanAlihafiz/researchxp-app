@@ -20,6 +20,7 @@ export const hi: MessageBranch = {
     tabHome: 'होम',
     tabRewards: 'पुरस्कार',
     tabProfile: 'प्रोफ़ाइल',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'साइन आउट',
@@ -141,7 +142,9 @@ export const hi: MessageBranch = {
   settings: {
     screenTitle: 'सेटिंग्स',
     screenLead: 'रूप और अन्य खाता वरीयताएँ।',
-    passwordOverline: 'पासवर्ड',
+    appLanguage: 'ऐप की भाषा',
+    darkMode: 'डार्क मोड',
+    passwordOverline: 'पासवर्ड बदलें',
     passwordHint: 'साइन-इन पासवर्ड बदलें। आपको वर्तमान पासवर्ड चाहिए।',
     updatePassword: 'पासवर्ड अपडेट',
     updatePasswordA11y: 'पासवर्ड अपडेट फ़ॉर्म खोलें',
@@ -191,13 +194,19 @@ export const hi: MessageBranch = {
   },
   home: {
     screenTitle: 'होम',
-    screenLead: 'आपका फ़ील्ड वर्कस्पेस: पॉइंट, सर्वे, और सेटिंग्स तक त्वरित पहुँच।',
-    pointsOverview: 'पॉइंट अवलोकन',
+    screenLead: 'आपका फ़ील्ड वर्कस्पेस: XP, सर्वे, और सेटिंग्स तक त्वरित पहुँच।',
+    pointsOverview: 'XP अवलोकन',
     statAvailable: 'उपलब्ध',
     statRedeemed: 'रिडीम',
     statInReview: 'समीक्षा में',
-    surveysHeading: 'सर्वे',
-    surveyMetaPts: 'पॉइंट',
+    surveysHeading: 'उपलब्ध सर्वे',
+    viewRewards: 'पुरस्कार देखें',
+    viewAllSurveys: 'सभी सर्वे देखें',
+    notificationsA11y: 'सूचनाएँ',
+    surveyEstimatedTimeVaries: 'अनुमानित समय सर्वे पर निर्भर करता है',
+    noOpenSurveys:
+      'अभी कोई खुला सर्वे नहीं है।',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • {when} तक',
     footerParagraph:
       'जिन सर्वे से आप मेल खाते हैं वे यहाँ दिखेंगे ताकि आप उन्हें फ़ील्ड में कर सकें। पुरस्कार और खाते के लिए पुरस्कार व प्रोफ़ाइल टैब देखें।',
@@ -205,7 +214,7 @@ export const hi: MessageBranch = {
   },
   rewards: {
     screenTitle: 'पुरस्कार',
-    screenLead: 'पूर्ण सर्वे से अर्जित पॉइंट और प्रोत्साहन देखें।',
+    screenLead: 'पूर्ण सर्वे से अर्जित XP और प्रोत्साहन देखें।',
     availableBalance: 'उपलब्ध शेष',
     totalRedeemed: 'कुल रिडीम',
     underReview: 'समीक्षा में',
@@ -213,17 +222,17 @@ export const hi: MessageBranch = {
     statusCompleted: 'पूर्ण',
     statusPending: 'लंबित',
     statusUnderReview: 'समीक्षा में',
-    ptsSuffix: 'पॉइंट',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'सहायता',
     screenLead: 'उत्तर खोजें और फ़ील्ड में सहायता के लिए ResearchXP टीम तक पहुँचें।',
     gettingStarted: 'शुरुआत',
     gettingStartedBody:
-      'ऑनबोर्डिंग पूरी करें, होम पर पुरस्कार शेष देखें, और मिले सर्वे खोलें। सेटिंग्स और सहायता के लिए दराज (☰)।',
+      'ऑनबोर्डिंग पूरी करें, होम पर XP और पुरस्कार शेष देखें, और मिले सर्वे खोलें। सेटिंग्स और सहायता के लिए दराज (☰)।',
     faqs: 'अकसर पूछे जाने वाले',
     faqsBody:
-      'सामान्य प्रश्न यहाँ दिखेंगे—नॉलेज बेस लिंक या सारांश (पॉइंट, पात्रता, पूर्णता)।',
+      'सामान्य प्रश्न यहाँ दिखेंगे—नॉलेज बेस लिंक या सारांश (XP, पात्रता, पूर्णता)।',
     contact: 'संपर्क',
     contactBody: 'सहायता ईमेल, फोन या इन-ऐप चैट जोड़ें जब चैनल तैयार हों।',
   },

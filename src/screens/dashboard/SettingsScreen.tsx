@@ -7,9 +7,11 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Switch,
   Text,
   View,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DrawerScreenProps } from '@react-navigation/drawer';
 import { updateMyPassword } from '../../api/memberProfile';
@@ -18,7 +20,6 @@ import { AppPressable } from '../../components/AppPressable';
 import { PasswordField } from '../../components/PasswordField';
 import { APP_LANGUAGES, useLocale, type AppLanguage } from '../../locale';
 import type { MainDrawerParamList } from '../../navigation/types';
-import type { ColorScheme } from '../../theme/palettes';
 import {
   createDashboardStyles,
   DASHBOARD_SCROLL_PADDING_TOP,
@@ -47,7 +48,7 @@ export default function SettingsScreen(_props: Props) {
   const { colors, colorScheme, setColorScheme } = useAppTheme();
   const { t, language, setLanguage } = useLocale();
   const { token } = useAuth();
-  const styles = useMemo(() => createDashboardStyles(colors), [colors]);
+  const dash = useMemo(() => createDashboardStyles(colors), [colors]);
 
   const [passwordModalVisible, setPasswordModalVisible] = useState(false);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
@@ -56,6 +57,58 @@ export default function SettingsScreen(_props: Props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordSaving, setPasswordSaving] = useState(false);
 
+  const ui = useMemo(
+    () =>
+      StyleSheet.create({
+        scroll: {
+          flex: 1,
+          backgroundColor: colors.background,
+        },
+        scrollContent: {
+          paddingHorizontal: 20,
+        },
+        optionCard: {
+          borderRadius: 14,
+          backgroundColor: colors.surface,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: colors.border,
+          marginBottom: 12,
+          overflow: 'hidden',
+        },
+        optionRow: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 14,
+          paddingHorizontal: 16,
+          minHeight: 54,
+        },
+        optionIcon: {
+          marginRight: 14,
+          width: 26,
+          alignItems: 'center',
+        },
+        optionLabel: {
+          flex: 1,
+          fontSize: 16,
+          fontWeight: '500',
+          color: colors.text,
+          letterSpacing: -0.1,
+          paddingRight: 8,
+        },
+        optionValue: {
+          fontSize: 15,
+          fontWeight: '400',
+          color: colors.textMuted,
+          marginRight: 6,
+          maxWidth: '38%',
+        },
+        screenLeadMb: {
+          marginBottom: 20,
+        },
+      }),
+    [colors],
+  );
+
   const modalStyles = useMemo(
     () =>
       StyleSheet.create({
@@ -63,6 +116,9 @@ export default function SettingsScreen(_props: Props) {
           flex: 1,
           backgroundColor: 'rgba(0,0,0,0.45)',
           justifyContent: 'flex-end',
+        },
+        keyboardAvoidingRoot: {
+          flex: 1,
         },
         sheet: {
           backgroundColor: colors.surface,
@@ -103,6 +159,9 @@ export default function SettingsScreen(_props: Props) {
           paddingHorizontal: 20,
           paddingTop: 18,
         },
+        sheetScrollCompact: {
+          flexGrow: 0,
+        },
         field: { marginBottom: 14 },
         label: {
           fontSize: 13,
@@ -130,26 +189,6 @@ export default function SettingsScreen(_props: Props) {
           fontSize: 16,
           fontWeight: '600',
         },
-        openPasswordBtn: {
-          alignSelf: 'flex-start',
-          backgroundColor: colors.buttonSecondary,
-          borderRadius: 12,
-          paddingVertical: 14,
-          paddingHorizontal: 22,
-          borderWidth: 1,
-          borderColor: colors.buttonSecondaryBorder,
-        },
-        openPasswordBtnText: {
-          color: colors.buttonSecondaryText,
-          fontSize: 15,
-          fontWeight: '600',
-        },
-        passwordSectionHint: {
-          fontSize: 14,
-          lineHeight: 21,
-          color: colors.textSecondary,
-          marginBottom: 14,
-        },
         langRow: {
           flexDirection: 'row',
           alignItems: 'center',
@@ -172,6 +211,9 @@ export default function SettingsScreen(_props: Props) {
           fontWeight: '700',
           color: colors.primary,
         },
+        langSpacer: {
+          width: 18,
+        },
       }),
     [colors, insets.bottom],
   );
@@ -190,8 +232,8 @@ export default function SettingsScreen(_props: Props) {
     resetPasswordForm();
   }, [passwordSaving, resetPasswordForm]);
 
-  const selectScheme = (scheme: ColorScheme) => {
-    setColorScheme(scheme);
+  const onDarkModeToggle = (next: boolean) => {
+    setColorScheme(next ? 'dark' : 'light');
   };
 
   const onSelectLanguage = (code: AppLanguage) => {
@@ -254,80 +296,105 @@ export default function SettingsScreen(_props: Props) {
     }
   };
 
+  const isDark = colorScheme === 'dark';
+  const currentLanguageLabel = t(LANGUAGE_LABEL_KEYS[language]);
+
   return (
     <>
       <ScrollView
-        style={styles.root}
-        contentContainerStyle={{
-          paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
-          paddingBottom: insets.bottom + 28,
-        }}
+        style={ui.scroll}
+        contentContainerStyle={[
+          ui.scrollContent,
+          {
+            paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
+            paddingBottom: insets.bottom + 28,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        <Text style={styles.screenTitle}>{t('settings.screenTitle')}</Text>
-        <Text style={styles.screenLead}>{t('settings.screenLead')}</Text>
+        <Text style={dash.screenTitle}>{t('settings.screenTitle')}</Text>
+        <Text style={[dash.screenLead, ui.screenLeadMb]}>
+          {t('settings.screenLead')}
+        </Text>
 
-        <Text style={styles.overline}>{t('settings.passwordOverline')}</Text>
-        <View style={styles.elevatedBlock}>
-          <Text style={modalStyles.passwordSectionHint}>
-            {t('settings.passwordHint')}
-          </Text>
+        <View style={ui.optionCard}>
           <AppPressable
-            style={modalStyles.openPasswordBtn}
+            style={ui.optionRow}
+            onPress={() => setLanguageModalVisible(true)}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('settings.appLanguage')}, ${currentLanguageLabel}`}>
+            <View style={ui.optionIcon}>
+              <Ionicons name="globe-outline" size={24} color={colors.text} />
+            </View>
+            <Text style={ui.optionLabel}>{t('settings.appLanguage')}</Text>
+            <Text
+              style={ui.optionValue}
+              numberOfLines={1}
+              ellipsizeMode="tail">
+              {currentLanguageLabel}
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={colors.textMuted}
+            />
+          </AppPressable>
+        </View>
+
+        <View style={ui.optionCard}>
+          <View
+            style={ui.optionRow}
+            accessibilityRole="none">
+            <View style={ui.optionIcon}>
+              <Ionicons
+                name="moon-outline"
+                size={24}
+                color={colors.text}
+              />
+            </View>
+            <Text style={ui.optionLabel}>{t('settings.darkMode')}</Text>
+            <Switch
+              accessibilityRole="switch"
+              accessibilityState={{ checked: isDark }}
+              accessibilityLabel={t('settings.darkMode')}
+              value={isDark}
+              onValueChange={onDarkModeToggle}
+              trackColor={{
+                false:
+                  Platform.OS === 'android' ? colors.border : undefined,
+                true: colors.primary,
+              }}
+              thumbColor={
+                Platform.OS === 'android'
+                  ? colors.surface
+                  : undefined
+              }
+              ios_backgroundColor={
+                Platform.OS === 'ios' ? colors.border : undefined
+              }
+            />
+          </View>
+        </View>
+
+        <View style={ui.optionCard}>
+          <AppPressable
+            style={ui.optionRow}
             onPress={() => setPasswordModalVisible(true)}
             accessibilityRole="button"
             accessibilityLabel={t('settings.updatePasswordA11y')}>
-            <Text style={modalStyles.openPasswordBtnText}>
-              {t('settings.updatePassword')}
-            </Text>
-          </AppPressable>
-        </View>
-
-        <Text style={styles.overline}>{t('settings.appearanceOverline')}</Text>
-        <View style={styles.themeRow}>
-          <AppPressable
-            onPress={() => selectScheme('light')}
-            style={[
-              styles.themeChip,
-              colorScheme === 'light' && styles.themeChipActive,
-            ]}>
-            <Text
-              style={[
-                styles.themeChipText,
-                colorScheme === 'light' && styles.themeChipTextActive,
-              ]}>
-              {t('settings.themeLight')}
-            </Text>
-          </AppPressable>
-          <AppPressable
-            onPress={() => selectScheme('dark')}
-            style={[
-              styles.themeChip,
-              colorScheme === 'dark' && styles.themeChipActive,
-            ]}>
-            <Text
-              style={[
-                styles.themeChipText,
-                colorScheme === 'dark' && styles.themeChipTextActive,
-              ]}>
-              {t('settings.themeDark')}
-            </Text>
-          </AppPressable>
-        </View>
-
-        <Text style={styles.overline}>{t('settings.languageOverline')}</Text>
-        <View style={styles.elevatedBlock}>
-          <Text style={modalStyles.passwordSectionHint}>
-            {t('settings.languageHint')}
-          </Text>
-          <AppPressable
-            style={modalStyles.openPasswordBtn}
-            onPress={() => setLanguageModalVisible(true)}
-            accessibilityRole="button"
-            accessibilityLabel={t('settings.selectLanguageA11y')}>
-            <Text style={modalStyles.openPasswordBtnText}>
-              {t('settings.selectLanguage')}
-            </Text>
+            <View style={ui.optionIcon}>
+              <Ionicons
+                name="lock-closed-outline"
+                size={24}
+                color={colors.text}
+              />
+            </View>
+            <Text style={ui.optionLabel}>{t('settings.passwordOverline')}</Text>
+            <Ionicons
+              name="chevron-forward"
+              size={22}
+              color={colors.textMuted}
+            />
           </AppPressable>
         </View>
       </ScrollView>
@@ -338,7 +405,7 @@ export default function SettingsScreen(_props: Props) {
         transparent
         onRequestClose={closePasswordModal}>
         <KeyboardAvoidingView
-          style={{ flex: 1 }}
+          style={modalStyles.keyboardAvoidingRoot}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={modalStyles.overlay}>
             <AppPressable
@@ -363,7 +430,7 @@ export default function SettingsScreen(_props: Props) {
                 </AppPressable>
               </View>
               <ScrollView
-                style={{ flexGrow: 0 }}
+                style={modalStyles.sheetScrollCompact}
                 contentContainerStyle={modalStyles.sheetBody}
                 keyboardShouldPersistTaps="handled"
                 showsVerticalScrollIndicator={false}>
@@ -472,7 +539,7 @@ export default function SettingsScreen(_props: Props) {
                   {language === code ? (
                     <Text style={modalStyles.langRowCheck}>✓</Text>
                   ) : (
-                    <View style={{ width: 18 }} />
+                    <View style={modalStyles.langSpacer} />
                   )}
                 </AppPressable>
               ))}

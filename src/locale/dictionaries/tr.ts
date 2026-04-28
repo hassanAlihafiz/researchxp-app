@@ -20,6 +20,7 @@ export const tr: MessageBranch = {
     tabHome: 'Ana sayfa',
     tabRewards: 'Ödüller',
     tabProfile: 'Profil',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Çıkış yap',
@@ -141,7 +142,9 @@ export const tr: MessageBranch = {
   settings: {
     screenTitle: 'Ayarlar',
     screenLead: 'Görünüm ve hesabınız için diğer tercihler.',
-    passwordOverline: 'Şifre',
+    appLanguage: 'Uygulama dili',
+    darkMode: 'Karanlık mod',
+    passwordOverline: 'Şifreyi değiştir',
     passwordHint:
       'Giriş şifrenizi değiştirin. Mevcut şifrenize ihtiyacınız vardır.',
     updatePassword: 'Şifreyi güncelle',
@@ -194,13 +197,19 @@ export const tr: MessageBranch = {
   home: {
     screenTitle: 'Ana sayfa',
     screenLead:
-      'Saha çalışma alanınız: puanlar, anketler ve ayarlara hızlı erişim.',
-    pointsOverview: 'Puan özeti',
+      'Saha çalışma alanınız: XP, anketler ve ayarlara hızlı erişim.',
+    pointsOverview: 'XP özeti',
     statAvailable: 'Kullanılabilir',
     statRedeemed: 'Kullanılan',
     statInReview: 'İnceleniyor',
-    surveysHeading: 'Anketler',
-    surveyMetaPts: 'Puan',
+    surveysHeading: 'Mevcut anketler',
+    viewRewards: 'Ödülleri görüntüle',
+    viewAllSurveys: 'Tüm anketleri görüntüle',
+    notificationsA11y: 'Bildirimler',
+    surveyEstimatedTimeVaries: 'Tahmini süre değişebilir',
+    noOpenSurveys:
+      'Güncelsiniz — şu anda açık anket yok.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Teslim: {when}',
     footerParagraph:
       'Size atanan anketler saha yürütmek için burada görünür. Ödüller ve hesap için Ödüller ve Profil bölümlerine bakın.',
@@ -208,7 +217,7 @@ export const tr: MessageBranch = {
   },
   rewards: {
     screenTitle: 'Ödüller',
-    screenLead: 'Tamamlanan anketlerden puan ve ödülleri takip edin.',
+    screenLead: 'Tamamlanan anketlerden XP ve ödülleri takip edin.',
     availableBalance: 'Kullanılabilir bakiye',
     totalRedeemed: 'Toplam kullanılan',
     underReview: 'İnceleniyor',
@@ -216,7 +225,7 @@ export const tr: MessageBranch = {
     statusCompleted: 'Tamamlandı',
     statusPending: 'Beklemede',
     statusUnderReview: 'İnceleniyor',
-    ptsSuffix: 'Puan',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Yardım',
@@ -224,10 +233,10 @@ export const tr: MessageBranch = {
       'Yanıt bulun ve sahadaki ResearchXP ekibiyle iletişime geçin.',
     gettingStarted: 'Başlarken',
     gettingStartedBody:
-      'Onboarding’i tamamlayın, ana sayfada ödül bakiyesine bakın ve atanan anketleri açın. Ayarlar ve yardım için menü (☰).',
+      'Onboarding’i tamamlayın, ana sayfada XP ve ödül bakiyesine bakın ve atanan anketleri açın. Ayarlar ve yardım için menü (☰).',
     faqs: 'SSS',
     faqsBody:
-      'Sık sorulan sorular burada—bilgi tabanı veya kısa özetler (puan, katılım, tamamlama) bağlantıları.',
+      'Sık sorulan sorular burada—bilgi tabanı veya kısa özetler (XP, katılım, tamamlama) bağlantıları.',
     contact: 'İletişim',
     contactBody:
       'Destek e-postası, telefon veya uygulama içi sohbet kanallarınız hazır olunca eklenebilir.',

@@ -20,6 +20,7 @@ export const ko: MessageBranch = {
     tabHome: '홈',
     tabRewards: '리워드',
     tabProfile: '프로필',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: '로그아웃',
@@ -141,7 +142,9 @@ export const ko: MessageBranch = {
   settings: {
     screenTitle: '설정',
     screenLead: '화면과 계정 기타 설정입니다.',
-    passwordOverline: '비밀번호',
+    appLanguage: '앱 언어',
+    darkMode: '다크 모드',
+    passwordOverline: '비밀번호 변경',
     passwordHint: '로그인 비밀번호를 변경합니다. 현재 비밀번호가 필요합니다.',
     updatePassword: '비밀번호 업데이트',
     updatePasswordA11y: '비밀번호 변경 양식 열기',
@@ -191,13 +194,19 @@ export const ko: MessageBranch = {
   },
   home: {
     screenTitle: '홈',
-    screenLead: '현장용 작업 공간: 포인트, 설문, 설정 바로가기.',
-    pointsOverview: '포인트 개요',
+    screenLead: '현장용 작업 공간: XP, 설문, 설정 바로가기.',
+    pointsOverview: 'XP 개요',
     statAvailable: '사용 가능',
     statRedeemed: '사용됨',
     statInReview: '검토 중',
-    surveysHeading: '설문',
-    surveyMetaPts: '점',
+    surveysHeading: '참여 가능한 설문',
+    viewRewards: '리워드 보기',
+    viewAllSurveys: '설문 모두 보기',
+    notificationsA11y: '알림',
+    surveyEstimatedTimeVaries: '예상 시간은 설문마다 다릅니다',
+    noOpenSurveys:
+      '참여할 열린 설문이 없습니다.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' · {when} 마감',
     footerParagraph:
       '나와 맞는 설문이 여기에 표시되어 현장에서 진행할 수 있습니다. 혜택과 계정은 리워드·프로필 탭을 이용하세요.',
@@ -205,7 +214,7 @@ export const ko: MessageBranch = {
   },
   rewards: {
     screenTitle: '리워드',
-    screenLead: '완료한 설문으로 적립한 포인트와 혜택을 확인하세요.',
+    screenLead: '완료한 설문으로 적립한 XP와 혜택을 확인하세요.',
     availableBalance: '사용 가능 잔액',
     totalRedeemed: '누적 사용',
     underReview: '검토 중',
@@ -213,17 +222,17 @@ export const ko: MessageBranch = {
     statusCompleted: '완료',
     statusPending: '대기',
     statusUnderReview: '검토 중',
-    ptsSuffix: '점',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: '도움말',
     screenLead: '답을 찾고, 현장에서 지원이 필요할 때 ResearchXP 팀에 문의하세요.',
     gettingStarted: '시작하기',
     gettingStartedBody:
-      '온보딩을 완료하고, 홈에서 리워드 잔액을 확인하며, 매칭된 설문을 여세요. 서랍(☰)에서 설정과 이 도움말로 이동합니다.',
+      '온보딩을 완료하고, 홈에서 XP와 리워드 잔액을 확인하며, 매칭된 설문을 여세요. 서랍(☰)에서 설정과 이 도움말로 이동합니다.',
     faqs: '자주 묻는 질문',
     faqsBody:
-      '자주 묻는 질문이 여기에 표시됩니다. 지식 베이스 링크나 일반 작업(포인트, 자격, 완료) 요약을 넣을 수 있습니다.',
+      '자주 묻는 질문이 여기에 표시됩니다. 지식 베이스 링크나 일반 작업(XP, 자격, 완료) 요약을 넣을 수 있습니다.',
     contact: '문의',
     contactBody: '지원이 준비되면 이메일, 전화, 앱 내 채팅을 추가하세요.',
   },

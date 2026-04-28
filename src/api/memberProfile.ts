@@ -1,5 +1,6 @@
 import { API_BASE_URL } from '../config/api';
 import { appLog, tokenPreview } from '../utils/appLog';
+import { authedFetch } from './authedFetch';
 import type { RegisteredAppUser } from './registerMember';
 
 async function readJson(
@@ -26,11 +27,8 @@ export async function fetchMyProfile(
 ): Promise<RegisteredAppUser | 'account_disabled' | null> {
   appLog('api', 'GET /api/members/me', { token: tokenPreview(token) });
   try {
-    const res = await fetch(`${API_BASE_URL}/api/members/me`, {
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await authedFetch(`${API_BASE_URL}/api/members/me`, token, {
+      method: 'GET',
     });
     const obj = await readJson(res);
     if (res.status === 403 && obj && obj.error === 'account_disabled') {
@@ -84,12 +82,10 @@ export async function updateMyProfile(
     name: body.name,
   });
   try {
-    const res = await fetch(`${API_BASE_URL}/api/members/me`, {
+    const res = await authedFetch(`${API_BASE_URL}/api/members/me`, token, {
       method: 'PATCH',
       headers: {
-        Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         name: body.name,
@@ -141,12 +137,10 @@ export async function updateMyPassword(
     token: tokenPreview(token),
   });
   try {
-    const res = await fetch(`${API_BASE_URL}/api/members/me/password`, {
+    const res = await authedFetch(`${API_BASE_URL}/api/members/me/password`, token, {
       method: 'PATCH',
       headers: {
-        Accept: 'application/json',
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
         currentPassword: body.currentPassword,
@@ -177,12 +171,8 @@ export async function deleteMyAccount(
 ): Promise<{ ok: true } | { ok: false; message: string; status: number }> {
   appLog('api', 'DELETE /api/members/me', { token: tokenPreview(token) });
   try {
-    const res = await fetch(`${API_BASE_URL}/api/members/me`, {
+    const res = await authedFetch(`${API_BASE_URL}/api/members/me`, token, {
       method: 'DELETE',
-      headers: {
-        Accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
     });
     const obj = await readJson(res);
     if (res.ok && obj && obj.ok === true) {

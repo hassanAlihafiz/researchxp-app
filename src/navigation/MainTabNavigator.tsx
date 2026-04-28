@@ -5,11 +5,14 @@ import {
 } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { AppPressable } from '../components/AppPressable';
-import { DrawerMenuButton } from './DrawerMenuButton';
 import type { MainTabParamList } from './types';
 import HomeScreen from '../screens/dashboard/HomeScreen';
 import RewardsScreen from '../screens/dashboard/RewardsScreen';
 import ProfileScreen from '../screens/dashboard/ProfileScreen';
+import {
+  MainTabHeaderLeading,
+  MainTabHeaderTrailing,
+} from './MainTabHeader';
 import { useLocale } from '../locale';
 import { dashboardHeaderTitleStyle } from '../theme/dashboardStyles';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -17,6 +20,14 @@ import { useAppTheme } from '../theme/ThemeContext';
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const TAB_ICON_SIZE = 24;
+
+function MainTabHeaderLeftBridge() {
+  return <MainTabHeaderLeading />;
+}
+
+function MainTabHeaderRightBridge() {
+  return <MainTabHeaderTrailing />;
+}
 
 function TabBarButton(props: BottomTabBarButtonProps) {
   return <AppPressable {...props} />;
@@ -29,12 +40,14 @@ export function MainTabNavigator() {
   const screenOptions = useMemo(
     () => ({
       headerShown: true,
-      headerStyle: { backgroundColor: colors.background },
+      headerStyle: {
+        backgroundColor: colors.background,
+        paddingBottom: 10,
+      },
       headerTintColor: colors.text,
       headerTitleStyle: dashboardHeaderTitleStyle(colors),
       headerShadowVisible: false,
       headerTitleAlign: 'center' as const,
-      headerLeft: () => <DrawerMenuButton />,
       tabBarStyle: {
         backgroundColor: colors.tabBar,
         borderTopColor: colors.tabBarBorder,
@@ -53,7 +66,10 @@ export function MainTabNavigator() {
         name="Home"
         component={HomeScreen}
         options={{
-          title: t('nav.tabHome'),
+          title: '',
+          headerTitle: () => null,
+          headerLeft: MainTabHeaderLeftBridge,
+          headerRight: MainTabHeaderRightBridge,
           tabBarLabel: t('nav.tabHome'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -68,7 +84,10 @@ export function MainTabNavigator() {
         name="Rewards"
         component={RewardsScreen}
         options={{
-          title: t('nav.tabRewards'),
+          title: '',
+          headerTitle: () => null,
+          headerLeft: MainTabHeaderLeftBridge,
+          headerRight: MainTabHeaderRightBridge,
           tabBarLabel: t('nav.tabRewards'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
@@ -83,7 +102,10 @@ export function MainTabNavigator() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          title: t('nav.tabProfile'),
+          title: '',
+          headerTitle: () => null,
+          headerLeft: MainTabHeaderLeftBridge,
+          headerRight: MainTabHeaderRightBridge,
           tabBarLabel: t('nav.tabProfile'),
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
