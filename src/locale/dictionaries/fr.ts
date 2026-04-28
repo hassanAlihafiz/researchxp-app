@@ -19,6 +19,7 @@ export const fr: MessageBranch = {
     tabHome: 'Accueil',
     tabRewards: 'Récompenses',
     tabProfile: 'Profil',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Se déconnecter',
@@ -140,7 +141,9 @@ export const fr: MessageBranch = {
   settings: {
     screenTitle: 'Paramètres',
     screenLead: 'Apparence et autres préférences de votre compte.',
-    passwordOverline: 'Mot de passe',
+    appLanguage: 'Langue',
+    darkMode: 'Mode sombre',
+    passwordOverline: 'Changer le mot de passe',
     passwordHint:
       'Modifiez votre mot de passe de connexion. Vous aurez besoin de votre mot de passe actuel.',
     updatePassword: 'Mettre à jour le mot de passe',
@@ -193,13 +196,19 @@ export const fr: MessageBranch = {
   home: {
     screenTitle: 'Accueil',
     screenLead:
-      'Votre espace terrain : points, enquêtes et accès rapide aux paramètres.',
-    pointsOverview: 'Aperçu des points',
+      'Votre espace terrain : XP, enquêtes et accès rapide aux paramètres.',
+    pointsOverview: 'Vue d’ensemble XP',
     statAvailable: 'Disponible',
     statRedeemed: 'Utilisé',
     statInReview: 'En cours d’examen',
-    surveysHeading: 'Enquêtes',
-    surveyMetaPts: 'pts',
+    surveysHeading: 'Enquêtes disponibles',
+    viewRewards: 'Voir les récompenses',
+    viewAllSurveys: 'Voir toutes les enquêtes',
+    notificationsA11y: 'Notifications',
+    surveyEstimatedTimeVaries: 'Durée indicative variable',
+    noOpenSurveys:
+      'Vous êtes à jour : aucune enquête ouverte pour le moment.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Échéance dans {when}',
     footerParagraph:
       'Les enquêtes auxquelles vous êtes affecté apparaîtront ici pour que vous puissiez les mener sur le terrain. Utilisez les onglets Récompenses et Profil pour les incitations et votre compte.',
@@ -207,7 +216,7 @@ export const fr: MessageBranch = {
   },
   rewards: {
     screenTitle: 'Récompenses',
-    screenLead: 'Suivez les points et les incitations gagnés grâce aux enquêtes terminées.',
+    screenLead: 'Suivez l’XP et les incitations gagnées grâce aux enquêtes terminées.',
     availableBalance: 'Solde disponible',
     totalRedeemed: 'Total utilisé',
     underReview: 'En cours d’examen',
@@ -215,7 +224,7 @@ export const fr: MessageBranch = {
     statusCompleted: 'Terminé',
     statusPending: 'En attente',
     statusUnderReview: 'En cours d’examen',
-    ptsSuffix: 'pts',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Aide',
@@ -223,10 +232,10 @@ export const fr: MessageBranch = {
       'Trouvez des réponses et contactez l’équipe ResearchXP lorsque vous avez besoin d’assistance sur le terrain.',
     gettingStarted: 'Pour commencer',
     gettingStartedBody:
-      'Terminez l’intégration, consultez votre solde de points sur l’onglet Accueil et ouvrez les enquêtes auxquelles vous êtes affecté. Utilisez le menu (☰) pour Paramètres et cet écran Aide.',
+      'Terminez l’intégration, consultez votre XP et récompenses sur l’onglet Accueil et ouvrez les enquêtes auxquelles vous êtes affecté. Utilisez le menu (☰) pour Paramètres et cet écran Aide.',
     faqs: 'FAQ',
     faqsBody:
-      'Les questions fréquentes apparaîtront ici — lien vers votre base de connaissances ou résumés pour les tâches courantes (points, éligibilité, fin d’enquête).',
+      'Les questions fréquentes apparaîtront ici — lien vers votre base de connaissances ou résumés pour les tâches courantes (XP, éligibilité, fin d’enquête).',
     contact: 'Contact',
     contactBody:
       'Ajoutez l’e-mail d’assistance, le téléphone ou le chat in-app lorsque vos canaux seront prêts.',

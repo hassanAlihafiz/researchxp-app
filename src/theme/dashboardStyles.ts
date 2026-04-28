@@ -185,6 +185,9 @@ export function createDashboardStyles(colors: AppPalette) {
       borderWidth: 1,
       borderColor: colors.buttonSecondaryBorder,
     },
+    listCardButton: {
+      marginTop: 12,
+    },
     buttonSecondaryText: {
       color: colors.buttonSecondaryText,
       fontSize: 15,

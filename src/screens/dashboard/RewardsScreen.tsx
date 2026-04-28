@@ -4,31 +4,32 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { MainTabParamList } from '../../navigation/types';
 import { dummyRewardsActivity, dummyRewardsSummary } from '../../data/dummyData';
-import {
-  createDashboardStyles,
-  DASHBOARD_SCROLL_PADDING_TOP,
-} from '../../theme/dashboardStyles';
+import { createHomeStyles } from './createHomeStyles';
+import { DASHBOARD_SCROLL_PADDING_TOP } from '../../theme/dashboardStyles';
 import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
+import type { AppPalette } from '../../theme/palettes';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Rewards'>;
 
+function activityDeltaStyle(colors: AppPalette, points: number): { color: string } {
+  if (points > 0) {
+    return { color: colors.primary };
+  }
+  if (points < 0) {
+    return { color: colors.text };
+  }
+  return { color: colors.textMuted };
+}
+
 export default function RewardsScreen(_props: Props) {
   const insets = useSafeAreaInsets();
-  const { colors } = useAppTheme();
+  const { colors, colorScheme } = useAppTheme();
   const { t } = useLocale();
-  const styles = useMemo(() => createDashboardStyles(colors), [colors]);
-
-  const deltaColorFor = (points: number) => {
-    if (points > 0) {
-      return colors.primary;
-    }
-    if (points < 0) {
-      return colors.text;
-    }
-    return colors.textSecondary;
-  };
-
+  const styles = useMemo(
+    () => createHomeStyles(colors, colorScheme),
+    [colors, colorScheme],
+  );
   const statusLabelFor = useCallback(
     (status: (typeof dummyRewardsActivity)[number]['status']) => {
       if (status === 'completed') {
@@ -42,54 +43,61 @@ export default function RewardsScreen(_props: Props) {
     [t],
   );
 
+  const balanceXp = dummyRewardsSummary.availableBalance;
+
   return (
     <ScrollView
-      style={styles.root}
-      contentContainerStyle={{
-        paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
-        paddingBottom: insets.bottom + 28,
-      }}
+      style={styles.scrollRoot}
+      contentContainerStyle={[
+        styles.scrollContent,
+        {
+          paddingTop: DASHBOARD_SCROLL_PADDING_TOP,
+          paddingBottom: insets.bottom + 28,
+        },
+      ]}
       showsVerticalScrollIndicator={false}>
-      <Text style={styles.screenTitle}>{t('rewards.screenTitle')}</Text>
-      <Text style={styles.screenLead}>{t('rewards.screenLead')}</Text>
-
-      <View style={styles.cardsRow}>
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>{t('rewards.availableBalance')}</Text>
-          <Text style={styles.statValue}>
-            {dummyRewardsSummary.availableBalance.toLocaleString()}
+      <View style={styles.balanceHero}>
+        <View style={styles.balanceHeroInner}>
+          <Text style={styles.balanceLabel}>{t('rewards.availableBalance')}</Text>
+          <Text style={[styles.balanceValue, styles.balanceValueRewardsHeroOnly]}>
+            {balanceXp.toLocaleString()} {t('rewards.xpSuffix')}
           </Text>
         </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>{t('rewards.totalRedeemed')}</Text>
-          <Text style={styles.statValue}>
-            {dummyRewardsSummary.totalRedeemed.toLocaleString()}
-          </Text>
-        </View>
-        <View style={styles.statCard}>
-          <Text style={styles.statLabel}>{t('rewards.underReview')}</Text>
-          <Text style={styles.statValue}>
-            {dummyRewardsSummary.underReview.toLocaleString()}
-          </Text>
+        <View style={styles.balanceHeroStatsRow}>
+          <View style={styles.balanceHeroStat}>
+            <Text style={styles.balanceHeroStatLabel}>{t('rewards.totalRedeemed')}</Text>
+            <Text style={styles.balanceHeroStatValue}>
+              {dummyRewardsSummary.totalRedeemed.toLocaleString()}
+            </Text>
+          </View>
+          <View style={styles.balanceHeroStat}>
+            <Text style={styles.balanceHeroStatLabel}>{t('rewards.underReview')}</Text>
+            <Text style={styles.balanceHeroStatValue}>
+              {dummyRewardsSummary.underReview.toLocaleString()}
+            </Text>
+          </View>
         </View>
       </View>
 
-      <Text style={styles.overline}>{t('rewards.recentActivity')}</Text>
+      <Text style={styles.sectionTitle}>{t('rewards.recentActivity')}</Text>
+
       {dummyRewardsActivity.map(item => (
-        <View key={item.id} style={styles.listCard}>
-          <View style={styles.activityRowTop}>
-            <Text style={styles.activityTitle}>{item.title}</Text>
-            <Text
-              style={[
-                styles.activityDelta,
-                { color: deltaColorFor(item.points) },
-              ]}>
-              {item.points > 0 ? '+' : ''}
-              {item.points.toLocaleString()} {t('rewards.ptsSuffix')}
+        <View key={item.id} style={styles.surveyRow}>
+          <View style={styles.surveyTexts}>
+            <Text style={styles.surveyTitle} numberOfLines={2}>
+              {item.title}
+            </Text>
+            <Text style={styles.surveySubtitle} numberOfLines={2}>
+              {item.date} • {statusLabelFor(item.status)}
             </Text>
           </View>
-          <Text style={styles.listCardMeta}>
-            {item.date} • {statusLabelFor(item.status)}
+          <Text
+            style={[
+              styles.surveyXp,
+              activityDeltaStyle(colors, item.points),
+            ]}>
+            {item.points > 0 ? '+' : ''}
+            {item.points.toLocaleString()} {t('rewards.xpSuffix')}
           </Text>
         </View>
       ))}

@@ -20,6 +20,7 @@ export const de: MessageBranch = {
     tabHome: 'Start',
     tabRewards: 'Prämien',
     tabProfile: 'Profil',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Abmelden',
@@ -141,7 +142,9 @@ export const de: MessageBranch = {
   settings: {
     screenTitle: 'Einstellungen',
     screenLead: 'Erscheinungsbild und weitere Einstellungen für Ihr Konto.',
-    passwordOverline: 'Passwort',
+    appLanguage: 'App-Sprache',
+    darkMode: 'Dunkelmodus',
+    passwordOverline: 'Passwort ändern',
     passwordHint:
       'Ändern Sie Ihr Anmeldepasswort. Sie benötigen Ihr aktuelles Passwort.',
     updatePassword: 'Passwort ändern',
@@ -194,13 +197,19 @@ export const de: MessageBranch = {
   home: {
     screenTitle: 'Start',
     screenLead:
-      'Ihr Feld-Arbeitsbereich: Punkte, Umfragen und schneller Zugriff auf Einstellungen.',
-    pointsOverview: 'Punkteübersicht',
+      'Ihr Feld-Arbeitsbereich: XP, Umfragen und schneller Zugriff auf Einstellungen.',
+    pointsOverview: 'XP-Übersicht',
     statAvailable: 'Verfügbar',
     statRedeemed: 'Eingelöst',
     statInReview: 'In Prüfung',
-    surveysHeading: 'Umfragen',
-    surveyMetaPts: 'Pkt.',
+    surveysHeading: 'Verfügbare Umfragen',
+    viewRewards: 'Prämien ansehen',
+    viewAllSurveys: 'Alle Umfragen anzeigen',
+    notificationsA11y: 'Benachrichtigungen',
+    surveyEstimatedTimeVaries: 'Geschätzte Dauer variiert',
+    noOpenSurveys:
+      'Du bist auf dem neuesten Stand — derzeit keine offenen Umfragen.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Fällig in {when}',
     footerParagraph:
       'Umfragen, denen Sie zugeordnet sind, erscheinen hier zur Durchführung vor Ort. Prämien und Konto finden Sie unter Prämien und Profil.',
@@ -208,7 +217,7 @@ export const de: MessageBranch = {
   },
   rewards: {
     screenTitle: 'Prämien',
-    screenLead: 'Punkte und Prämien aus abgeschlossenen Umfragen verfolgen.',
+    screenLead: 'XP und Prämien aus abgeschlossenen Umfragen verfolgen.',
     availableBalance: 'Verfügbarer Saldo',
     totalRedeemed: 'Gesamt eingelöst',
     underReview: 'In Prüfung',
@@ -216,7 +225,7 @@ export const de: MessageBranch = {
     statusCompleted: 'Abgeschlossen',
     statusPending: 'Ausstehend',
     statusUnderReview: 'In Prüfung',
-    ptsSuffix: 'Pkt.',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Hilfe',
@@ -224,10 +233,10 @@ export const de: MessageBranch = {
       'Antworten finden und das ResearchXP-Team im Feld kontaktieren.',
     gettingStarted: 'Erste Schritte',
     gettingStartedBody:
-      'Onboarding abschließen, Prämiensaldo auf Start prüfen und zugewiesene Umfragen öffnen. Menü (☰) für Einstellungen und Hilfe.',
+      'Onboarding abschließen, XP und Prämien auf Start prüfen und zugewiesene Umfragen öffnen. Menü (☰) für Einstellungen und Hilfe.',
     faqs: 'FAQs',
     faqsBody:
-      'Häufige Fragen erscheinen hier—Verknüpfung zur Wissensdatenbank oder Kurzfassungen (Punkte, Teilnahme, Abschluss).',
+      'Häufige Fragen erscheinen hier—Verknüpfung zur Wissensdatenbank oder Kurzfassungen (XP, Teilnahme, Abschluss).',
     contact: 'Kontakt',
     contactBody:
       'Support-E-Mail, Telefon oder In-App-Chat ergänzen, sobald Ihre Kanäle bereitstehen.',

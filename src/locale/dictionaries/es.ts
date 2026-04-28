@@ -19,6 +19,7 @@ export const es: MessageBranch = {
     tabHome: 'Inicio',
     tabRewards: 'Recompensas',
     tabProfile: 'Perfil',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Cerrar sesión',
@@ -140,7 +141,9 @@ export const es: MessageBranch = {
   settings: {
     screenTitle: 'Ajustes',
     screenLead: 'Apariencia y otras preferencias de tu cuenta.',
-    passwordOverline: 'Contraseña',
+    appLanguage: 'Idioma',
+    darkMode: 'Modo oscuro',
+    passwordOverline: 'Cambiar contraseña',
     passwordHint:
       'Cambia tu contraseña de acceso. Necesitarás la contraseña actual.',
     updatePassword: 'Actualizar contraseña',
@@ -193,13 +196,19 @@ export const es: MessageBranch = {
   home: {
     screenTitle: 'Inicio',
     screenLead:
-      'Tu espacio de trabajo de campo: puntos, encuestas y acceso rápido a los ajustes.',
-    pointsOverview: 'Resumen de puntos',
+      'Tu espacio de trabajo de campo: XP, encuestas y acceso rápido a los ajustes.',
+    pointsOverview: 'Vista general de XP',
     statAvailable: 'Disponible',
     statRedeemed: 'Canjeado',
     statInReview: 'En revisión',
-    surveysHeading: 'Encuestas',
-    surveyMetaPts: 'pts',
+    surveysHeading: 'Encuestas disponibles',
+    viewRewards: 'Ver recompensas',
+    viewAllSurveys: 'Ver todas las encuestas',
+    notificationsA11y: 'Notificaciones',
+    surveyEstimatedTimeVaries: 'El tiempo estimado varía',
+    noOpenSurveys:
+      'Ya estás al día: no hay encuestas abiertas en este momento.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Vence en {when}',
     footerParagraph:
       'Las encuestas con las que coincidas aparecerán aquí para realizarlas en campo. Usa las pestañas Recompensas y Perfil para incentivos y tu cuenta.',
@@ -207,7 +216,7 @@ export const es: MessageBranch = {
   },
   rewards: {
     screenTitle: 'Recompensas',
-    screenLead: 'Sigue los puntos e incentivos que ganas con encuestas completadas.',
+    screenLead: 'Sigue el XP y los incentivos que ganas con encuestas completadas.',
     availableBalance: 'Saldo disponible',
     totalRedeemed: 'Total canjeado',
     underReview: 'En revisión',
@@ -215,7 +224,7 @@ export const es: MessageBranch = {
     statusCompleted: 'Completado',
     statusPending: 'Pendiente',
     statusUnderReview: 'En revisión',
-    ptsSuffix: 'pts',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Ayuda',
@@ -223,10 +232,10 @@ export const es: MessageBranch = {
       'Encuentra respuestas y contacta al equipo de ResearchXP cuando necesites apoyo en campo.',
     gettingStarted: 'Primeros pasos',
     gettingStartedBody:
-      'Completa la incorporación, revisa tu saldo de puntos en Inicio y abre las encuestas con las que coincidas. Usa el menú (☰) para Ajustes y esta pantalla de Ayuda.',
+      'Completa la incorporación, revisa tu XP y recompensas en Inicio y abre las encuestas con las que coincidas. Usa el menú (☰) para Ajustes y esta pantalla de Ayuda.',
     faqs: 'Preguntas frecuentes',
     faqsBody:
-      'Las preguntas frecuentes aparecerán aquí: enlace a tu base de conocimiento o resúmenes de tareas habituales (puntos, elegibilidad, finalización de encuestas).',
+      'Las preguntas frecuentes aparecerán aquí: enlace a tu base de conocimiento o resúmenes de tareas habituales (XP, elegibilidad, finalización de encuestas).',
     contact: 'Contacto',
     contactBody:
       'Añade correo de soporte, teléfono o chat en la app cuando tus canales estén listos.',

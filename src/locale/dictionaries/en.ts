@@ -20,6 +20,7 @@ export const en: MessageBranch = {
     tabHome: 'Home',
     tabRewards: 'Rewards',
     tabProfile: 'Profile',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Sign out',
@@ -160,12 +161,14 @@ export const en: MessageBranch = {
   },
   settings: {
     screenTitle: 'Settings',
-    screenLead: 'Appearance and other preferences for your account.',
-    passwordOverline: 'Password',
+    screenLead: 'Preferences and account security.',
+    appLanguage: 'App Language',
+    darkMode: 'Dark Mode',
+    passwordOverline: 'Change password',
     passwordHint:
       'Change your sign-in password. You will need your current password.',
     updatePassword: 'Update password',
-    updatePasswordA11y: 'Open update password form',
+    updatePasswordA11y: 'Change password',
     appearanceOverline: 'Appearance',
     themeLight: 'Light',
     themeDark: 'Dark',
@@ -214,21 +217,38 @@ export const en: MessageBranch = {
   home: {
     screenTitle: 'Home',
     screenLead:
-      'Your field workspace: points, surveys, and quick access to settings.',
-    pointsOverview: 'Points overview',
+      'Your field workspace: XP, surveys, and quick access to settings.',
+    pointsOverview: 'XP overview',
     statAvailable: 'Available',
     statRedeemed: 'Redeemed',
     statInReview: 'In review',
-    surveysHeading: 'Surveys',
-    surveyMetaPts: 'pts',
+    surveysHeading: 'Available Surveys',
+    viewRewards: 'View Rewards',
+    viewAllSurveys: 'View All Surveys',
+    notificationsA11y: 'Notifications',
+    surveyEstimatedTimeVaries: 'Estimated time varies',
+    noOpenSurveys:
+      "You're all caught up — there are no open surveys right now.",
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Due in {when}',
+    surveysLoading: 'Loading your surveys…',
+    surveysLoadError: 'Could not load surveys. Pull to try again.',
+    surveysEmpty: 'No surveys assigned yet. When you are matched to a study, it will show up here.',
+    openSurvey: 'Open survey',
+    openSurveyA11y: 'Open survey in browser',
+    surveyCompletedOn: 'Completed {date}',
+    surveyStatusCompleted: 'Completed',
+    surveyStatusPending: 'Open',
+    surveyStatusOther: 'Status: {status}',
+    surveyUntitled: 'Study #{projectId}',
     footerParagraph:
       'Surveys you are matched with will appear here so you can conduct them in the field. Use the Rewards and Profile tabs for incentives and your account.',
     footerHint: 'Tap ☰ in the header to open Settings and Help.',
   },
   rewards: {
     screenTitle: 'Rewards',
-    screenLead: 'Track points and incentives you earn from completed surveys.',
+    screenLead:
+      'Track XP and incentives you earn from completed surveys.',
     availableBalance: 'Available balance',
     totalRedeemed: 'Total redeemed',
     underReview: 'Under review',
@@ -236,7 +256,7 @@ export const en: MessageBranch = {
     statusCompleted: 'Completed',
     statusPending: 'Pending',
     statusUnderReview: 'Under review',
-    ptsSuffix: 'pts',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Help',
@@ -244,10 +264,10 @@ export const en: MessageBranch = {
       'Find answers and reach the ResearchXP team when you need support in the field.',
     gettingStarted: 'Getting started',
     gettingStartedBody:
-      'Complete onboarding, check your rewards balance on the Home tab, and open surveys you are matched with. Use the drawer (☰) for Settings and this Help screen.',
+      'Complete onboarding, check your XP and rewards balance on the Home tab, and open surveys you are matched with. Use the drawer (☰) for Settings and this Help screen.',
     faqs: 'FAQs',
     faqsBody:
-      'Frequently asked questions will appear here—link to your knowledge base or embed summaries for common tasks (points, eligibility, survey completion).',
+      'Frequently asked questions will appear here—link to your knowledge base or embed summaries for common tasks (XP, eligibility, survey completion).',
     contact: 'Contact',
     contactBody:
       'Add support email, phone, or in-app chat when your support channels are ready.',

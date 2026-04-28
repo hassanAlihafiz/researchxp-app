@@ -20,6 +20,7 @@ export const pt: MessageBranch = {
     tabHome: 'Início',
     tabRewards: 'Recompensas',
     tabProfile: 'Perfil',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'Terminar sessão',
@@ -141,7 +142,9 @@ export const pt: MessageBranch = {
   settings: {
     screenTitle: 'Definições',
     screenLead: 'Aparência e outras preferências da sua conta.',
-    passwordOverline: 'Palavra-passe',
+    appLanguage: 'Idioma',
+    darkMode: 'Modo escuro',
+    passwordOverline: 'Alterar palavra-passe',
     passwordHint:
       'Altere a palavra-passe de início de sessão. Precisará da palavra-passe atual.',
     updatePassword: 'Atualizar palavra-passe',
@@ -194,13 +197,19 @@ export const pt: MessageBranch = {
   home: {
     screenTitle: 'Início',
     screenLead:
-      'O seu espaço de trabalho: pontos, inquéritos e acesso rápido às definições.',
-    pointsOverview: 'Resumo de pontos',
+      'O seu espaço de trabalho: XP, inquéritos e acesso rápido às definições.',
+    pointsOverview: 'Visão geral de XP',
     statAvailable: 'Disponível',
     statRedeemed: 'Resgatado',
     statInReview: 'Em revisão',
-    surveysHeading: 'Inquéritos',
-    surveyMetaPts: 'pts',
+    surveysHeading: 'Inquéritos disponíveis',
+    viewRewards: 'Ver recompensas',
+    viewAllSurveys: 'Ver todos os inquéritos',
+    notificationsA11y: 'Notificações',
+    surveyEstimatedTimeVaries: 'O tempo estimado varia',
+    noOpenSurveys:
+      'Está em dia — não há inquéritos abertos neste momento.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • Prazo em {when}',
     footerParagraph:
       'Os inquéritos a que for associado aparecem aqui. Use Recompensas e Perfil para incentivos e a sua conta.',
@@ -208,7 +217,7 @@ export const pt: MessageBranch = {
   },
   rewards: {
     screenTitle: 'Recompensas',
-    screenLead: 'Acompanhe pontos e incentivos de inquéritos concluídos.',
+    screenLead: 'Acompanhe XP e incentivos de inquéritos concluídos.',
     availableBalance: 'Saldo disponível',
     totalRedeemed: 'Total resgatado',
     underReview: 'Em revisão',
@@ -216,7 +225,7 @@ export const pt: MessageBranch = {
     statusCompleted: 'Concluído',
     statusPending: 'Pendente',
     statusUnderReview: 'Em revisão',
-    ptsSuffix: 'pts',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'Ajuda',
@@ -224,10 +233,10 @@ export const pt: MessageBranch = {
       'Encontre respostas e contacte a equipa ResearchXP no terreno.',
     gettingStarted: 'Primeiros passos',
     gettingStartedBody:
-      'Conclua a integração, veja o saldo em Início e abra inquéritos a que for associado. Use o menu (☰) para Definições e esta Ajuda.',
+      'Conclua a integração, veja o XP e as recompensas em Início e abra inquéritos a que for associado. Use o menu (☰) para Definições e esta Ajuda.',
     faqs: 'Perguntas frequentes',
     faqsBody:
-      'As FAQs aparecem aqui—ligue à base de conhecimento ou resumos (pontos, elegibilidade, conclusão).',
+      'As FAQs aparecem aqui—ligue à base de conhecimento ou resumos (XP, elegibilidade, conclusão).',
     contact: 'Contacto',
     contactBody:
       'Adicione e-mail, telefone ou chat quando os canais estiverem prontos.',

@@ -20,6 +20,7 @@ export const ja: MessageBranch = {
     tabHome: 'ホーム',
     tabRewards: '特典',
     tabProfile: 'プロフィール',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'ログアウト',
@@ -141,7 +142,9 @@ export const ja: MessageBranch = {
   settings: {
     screenTitle: '設定',
     screenLead: '外観とアカウントのその他の設定です。',
-    passwordOverline: 'パスワード',
+    appLanguage: 'アプリの言語',
+    darkMode: 'ダークモード',
+    passwordOverline: 'パスワードを変更',
     passwordHint: 'ログインパスワードを変更します。現在のパスワードが必要です。',
     updatePassword: 'パスワードを更新',
     updatePasswordA11y: 'パスワード更新フォームを開く',
@@ -191,13 +194,19 @@ export const ja: MessageBranch = {
   },
   home: {
     screenTitle: 'ホーム',
-    screenLead: 'フィールド向けのワークスペース：ポイント、アンケート、設定へのクイックアクセス。',
-    pointsOverview: 'ポイント概要',
+    screenLead: 'フィールド向けのワークスペース：XP、アンケート、設定へのクイックアクセス。',
+    pointsOverview: 'XP 概要',
     statAvailable: '利用可能',
     statRedeemed: '使用済み',
     statInReview: '審査中',
-    surveysHeading: 'アンケート',
-    surveyMetaPts: 'pt',
+    surveysHeading: '利用可能なアンケート',
+    viewRewards: '特典を見る',
+    viewAllSurveys: 'すべてのアンケートを見る',
+    notificationsA11y: '通知',
+    surveyEstimatedTimeVaries: '所要時間はアンケートによります',
+    noOpenSurveys:
+      '現在、未回答のアンケートはありません。',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' · 期限 {when}',
     footerParagraph:
       'マッチしたアンケートはここに表示され、現地で実施できます。特典とアカウントは「特典」「プロフィール」タブをご利用ください。',
@@ -205,7 +214,7 @@ export const ja: MessageBranch = {
   },
   rewards: {
     screenTitle: '特典',
-    screenLead: '完了したアンケートで獲得するポイントと特典を追跡します。',
+    screenLead: '完了したアンケートで獲得する XP と特典を追跡します。',
     availableBalance: '利用可能残高',
     totalRedeemed: '累計使用',
     underReview: '審査中',
@@ -213,17 +222,17 @@ export const ja: MessageBranch = {
     statusCompleted: '完了',
     statusPending: '保留中',
     statusUnderReview: '審査中',
-    ptsSuffix: 'pt',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'ヘルプ',
     screenLead: '答えを見つけ、現地でサポートが必要なときは ResearchXP チームに連絡します。',
     gettingStarted: 'はじめに',
     gettingStartedBody:
-      'オンボーディングを完了し、ホームで特典残高を確認し、マッチしたアンケートを開きます。ドロワー (☰) から設定と本ヘルプに進みます。',
+      'オンボーディングを完了し、ホームで XP と特典残高を確認し、マッチしたアンケートを開きます。ドロワー (☰) から設定と本ヘルプに進みます。',
     faqs: 'よくある質問',
     faqsBody:
-      'FAQ はここに表示されます。ナレッジベースへのリンクや、よくある作業（ポイント、対象、完了）の要約を埋め込めます。',
+      'FAQ はここに表示されます。ナレッジベースへのリンクや、よくある作業（XP、対象、完了）の要約を埋め込めます。',
     contact: 'お問い合わせ',
     contactBody: 'サポートのメール、電話、アプリ内チャットは、体制が整い次第追加できます。',
   },

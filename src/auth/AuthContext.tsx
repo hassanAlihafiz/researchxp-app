@@ -1,6 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  registerAccessTokenRotation,
+  registerUnauthorizedHandler,
+} from '../api/authedFetch';
 import { fetchMyProfile } from '../api/memberProfile';
 import type { RegisteredAppUser } from '../api/registerMember';
+import { resetToLogin } from '../navigation/navigationRef';
 import { appLog, tokenPreview } from '../utils/appLog';
 import React, {
   createContext,
@@ -63,6 +68,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   /** Prevents a slow initial profile fetch from writing after sign-out / account deletion. */
   const activeTokenRef = useRef<string | null>(null);
 
+  const replaceSessionToken = useCallback(
+    async (newToken: string) => {
+      const em = email;
+      if (!em) {
+        appLog('auth', 'token rotation ignored (no email in session)');
+        return;
+      }
+      appLog('auth', 'access token rotated', { token: tokenPreview(newToken) });
+      activeTokenRef.current = newToken;
+      setToken(newToken);
+      const session: AuthSession = {
+        email: em,
+        token: newToken,
+        user: user ?? undefined,
+      };
+      await AsyncStorage.setItem(SESSION_KEY, JSON.stringify(session));
+    },
+    [email, user],
+  );
+
+  const replaceSessionTokenRef = useRef(replaceSessionToken);
+  replaceSessionTokenRef.current = replaceSessionToken;
+
+  useEffect(() => {
+    registerAccessTokenRotation(t => {
+      void replaceSessionTokenRef.current(t);
+    });
+    return () => registerAccessTokenRotation(null);
+  }, []);
+
   const signOut = useCallback(async () => {
     appLog('auth', 'signOut (clearing user session storage)');
     activeTokenRef.current = null;
@@ -72,6 +107,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
     setIsSignedIn(false);
   }, []);
+
+  useEffect(() => {
+    registerUnauthorizedHandler(() => {
+      void (async () => {
+        appLog('auth', '401 session error — clearing storage and returning to login');
+        await signOut();
+        resetToLogin();
+      })();
+    });
+    return () => registerUnauthorizedHandler(null);
+  }, [signOut]);
 
   useEffect(() => {
     let cancelled = false;

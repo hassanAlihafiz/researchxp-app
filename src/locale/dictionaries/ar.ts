@@ -20,6 +20,7 @@ export const ar: MessageBranch = {
     tabHome: 'الرئيسية',
     tabRewards: 'المكافآت',
     tabProfile: 'الملف الشخصي',
+    brandName: 'ResearchXP',
   },
   drawer: {
     signOut: 'تسجيل الخروج',
@@ -141,7 +142,9 @@ export const ar: MessageBranch = {
   settings: {
     screenTitle: 'الإعدادات',
     screenLead: 'المظهر وتفضيلات أخرى لحسابك.',
-    passwordOverline: 'كلمة المرور',
+    appLanguage: 'لغة التطبيق',
+    darkMode: 'الوضع الداكن',
+    passwordOverline: 'تغيير كلمة المرور',
     passwordHint: 'غيّر كلمة مرور تسجيل الدخول. ستحتاج إلى كلمة المرور الحالية.',
     updatePassword: 'تحديث كلمة المرور',
     updatePasswordA11y: 'فتح نموذج تحديث كلمة المرور',
@@ -191,13 +194,19 @@ export const ar: MessageBranch = {
   },
   home: {
     screenTitle: 'الرئيسية',
-    screenLead: 'مساحة عملك الميدانية: النقاط، الاستبيانات، ووصول سريع للإعدادات.',
-    pointsOverview: 'نظرة عامة على النقاط',
+    screenLead: 'مساحة عملك الميدانية: XP، الاستبيانات، ووصول سريع للإعدادات.',
+    pointsOverview: 'نظرة عامة على XP',
     statAvailable: 'متاح',
     statRedeemed: 'مستبدَل',
     statInReview: 'قيد المراجعة',
-    surveysHeading: 'الاستبيانات',
-    surveyMetaPts: 'نقطة',
+    surveysHeading: 'الاستبيانات المتاحة',
+    viewRewards: 'عرض المكافآت',
+    viewAllSurveys: 'عرض كل الاستبيانات',
+    notificationsA11y: 'الإشعارات',
+    surveyEstimatedTimeVaries: 'يختلف الوقت المتوقع حسب الاستبيان',
+    noOpenSurveys:
+      'لا توجد استبيانات مفتوحة الآن.',
+    surveyMetaXp: 'XP',
     surveyMetaDue: ' • موعد {when}',
     footerParagraph:
       'تظهر هنا الاستبيانات التي تطابقك لتنفيذها ميدانيًا. استخدم تبويبي المكافآت والملف للحوافز وحسابك.',
@@ -205,7 +214,7 @@ export const ar: MessageBranch = {
   },
   rewards: {
     screenTitle: 'المكافآت',
-    screenLead: 'تتبع النقاط والحوافز من الاستبيانات المكتملة.',
+    screenLead: 'تتبع XP والحوافز من الاستبيانات المكتملة.',
     availableBalance: 'الرصيد المتاح',
     totalRedeemed: 'الإجمالي المستبدَل',
     underReview: 'قيد المراجعة',
@@ -213,17 +222,17 @@ export const ar: MessageBranch = {
     statusCompleted: 'مكتمل',
     statusPending: 'قيد الانتظار',
     statusUnderReview: 'قيد المراجعة',
-    ptsSuffix: 'نقطة',
+    xpSuffix: 'XP',
   },
   help: {
     screenTitle: 'المساعدة',
     screenLead: 'ابحث عن إجابات وتواصل مع فريق ResearchXP عند الحاجة للدعم ميدانيًا.',
     gettingStarted: 'البدء',
     gettingStartedBody:
-      'أكمل التهيئة، راجع رصيد المكافآت في الرئيسية، وافتح الاستبيانات المطابقة. استخدم القائمة (☰) للإعدادات وشاشة المساعدة.',
+      'أكمل التهيئة، راجع XP والمكافآت في الرئيسية، وافتح الاستبيانات المطابقة. استخدم القائمة (☰) للإعدادات وشاشة المساعدة.',
     faqs: 'الأسئلة الشائعة',
     faqsBody:
-      'ستظهر الأسئلة الشائعة هنا—يمكن الربط بقاعدة المعرفة أو إدراج ملخصات (النقاط، الأهلية، الإكمال).',
+      'ستظهر الأسئلة الشائعة هنا—يمكن الربط بقاعدة المعرفة أو إدراج ملخصات (XP، الأهلية، الإكمال).',
     contact: 'اتصل بنا',
     contactBody: 'أضف بريد الدعم أو الهاتف أو الدردشة داخل التطبيق عند جاهزية قنواتك.',
   },
