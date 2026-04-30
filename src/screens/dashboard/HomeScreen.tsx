@@ -1,12 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Linking,
+  Modal,
   RefreshControl,
   ScrollView,
+  StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
@@ -19,6 +21,11 @@ import {
   fetchMySurveyAssignments,
   type MemberSurveyAssignment,
 } from '../../api/memberSurveyAssignments';
+import {
+  dismissImpactCardRequest,
+  fetchImpactCard,
+  type ImpactCardApiPayload,
+} from '../../api/onboardingApi';
 import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { createHomeStyles } from './createHomeStyles';
@@ -61,7 +68,7 @@ export default function HomeScreen(_props: Props) {
   const insets = useSafeAreaInsets();
   const { colors, colorScheme } = useAppTheme();
   const { t } = useLocale();
-  const { token, signOut } = useAuth();
+  const { token, signOut, updateSessionUser } = useAuth();
   const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
   const styles = useMemo(
     () => createHomeStyles(colors, colorScheme),
@@ -74,6 +81,8 @@ export default function HomeScreen(_props: Props) {
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [showAllSurveyRows, setShowAllSurveyRows] = useState(false);
+  const [impactCard, setImpactCard] = useState<ImpactCardApiPayload | null>(null);
+  const [impactBusy, setImpactBusy] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -129,6 +138,47 @@ export default function HomeScreen(_props: Props) {
     setRefreshing(false);
   }, [token, signOut]);
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!token) {
+        setImpactCard(null);
+        return undefined;
+      }
+      let cancelled = false;
+      (async () => {
+        const data = await fetchImpactCard(token);
+        if (cancelled || !data) {
+          return;
+        }
+        setImpactCard(data);
+      })();
+      return () => {
+        cancelled = true;
+      };
+    }, [token]),
+  );
+
+  const dismissImpactUi = useCallback(async () => {
+    if (!token) {
+      return;
+    }
+    setImpactBusy(true);
+    try {
+      const u = await dismissImpactCardRequest(token);
+      setImpactCard({ show: false });
+      if (u) {
+        await updateSessionUser(u);
+      }
+    } finally {
+      setImpactBusy(false);
+    }
+  }, [token, updateSessionUser]);
+
+  const onImpactBuildProfile = useCallback(async () => {
+    navigation.navigate('Profile');
+    await dismissImpactUi();
+  }, [navigation, dismissImpactUi]);
+
   const list = useMemo(() => assignments ?? [], [assignments]);
   const openList = useMemo(
     () => list.filter(a => !isAssignmentCompleted(a.status)),
@@ -145,8 +195,23 @@ export default function HomeScreen(_props: Props) {
 
   const balanceXp = dummyRewardsSummary.availableBalance;
 
+  const showImpactModal = impactCard?.show === true;
+  const impactEstimated =
+    showImpactModal && impactCard
+      ? new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
+          impactCard.estimated_value_cents / 100,
+        )
+      : '';
+  const impactEarnings =
+    showImpactModal && impactCard
+      ? new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
+          impactCard.earnings_today_cents / 100,
+        )
+      : '';
+
   return (
-    <ScrollView
+    <>
+      <ScrollView
       style={styles.scrollRoot}
       contentContainerStyle={[
         styles.scrollContent,
@@ -234,5 +299,102 @@ export default function HomeScreen(_props: Props) {
         </AppPressable>
       ) : null}
     </ScrollView>
+      <Modal
+        visible={showImpactModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => {
+          void dismissImpactUi();
+        }}>
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            backgroundColor: 'rgba(0,0,0,0.45)',
+            padding: 24,
+          }}>
+          <View
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: 16,
+              padding: 20,
+              borderWidth: StyleSheet.hairlineWidth,
+              borderColor: colors.border,
+            }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '800',
+                color: colors.text,
+                marginBottom: 10,
+              }}>
+              {t('onboarding.impactModalTitle')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 15,
+                lineHeight: 22,
+                color: colors.textSecondary,
+                marginBottom: 16,
+              }}>
+              {t('onboarding.impactModalBody')}
+            </Text>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.label }}>
+              {t('onboarding.impactModalEstimatedLabel')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 24,
+                fontWeight: '800',
+                color: colors.primary,
+                marginBottom: 12,
+                marginTop: 4,
+              }}>
+              {impactEstimated}
+            </Text>
+            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.label }}>
+              {t('onboarding.impactModalStudyLabel')}
+            </Text>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: '700',
+                color: colors.text,
+                marginBottom: 20,
+                marginTop: 4,
+              }}>
+              {impactEarnings}
+            </Text>
+            <AppPressable
+              style={{
+                backgroundColor: colors.primary,
+                borderRadius: 14,
+                paddingVertical: 14,
+                alignItems: 'center',
+                marginBottom: 10,
+                opacity: impactBusy ? 0.75 : 1,
+              }}
+              onPress={() => {
+                void onImpactBuildProfile();
+              }}
+              disabled={impactBusy}>
+              <Text style={{ color: colors.onPrimary, fontSize: 16, fontWeight: '700' }}>
+                {t('onboarding.impactModalBuildProfile')}
+              </Text>
+            </AppPressable>
+            <AppPressable
+              style={{ paddingVertical: 12, alignItems: 'center' }}
+              onPress={() => {
+                void dismissImpactUi();
+              }}
+              disabled={impactBusy}>
+              <Text style={{ color: colors.textMuted, fontSize: 15, fontWeight: '600' }}>
+                {t('onboarding.impactModalLater')}
+              </Text>
+            </AppPressable>
+          </View>
+        </View>
+      </Modal>
+    </>
   );
 }

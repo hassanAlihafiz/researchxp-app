@@ -82,7 +82,7 @@ export function MainDrawerContent(props: DrawerContentComponentProps) {
         contentContainerStyle={{ paddingTop: insets.top + 4 }}
         showsVerticalScrollIndicator={false}>
         <View style={styles.logoBlock}>
-          <ResearchLogo width={200} />
+          <ResearchLogo width={212} />
         </View>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>

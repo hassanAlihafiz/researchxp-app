@@ -9,21 +9,23 @@ import {
 } from 'react-native';
 import { useAppTheme } from '../theme/ThemeContext';
 
-/** Source assets: 609×158 px */
-const LOGO_ASPECT = 609 / 158;
+/** Horizontal lockups, trimmed to opaque bounds (~986×146). */
+const LOGO_ASPECT = 986 / 146;
 
-const logoForLightBackground = require('../assets/ResearchXPLogo-03.png');
-const logoForDarkBackground = require('../assets/ResearchXPLogoWhite-03.png');
+/** Light UI — `05-lockup-light` (mark + dark “Research” on transparent). */
+const logoForLightBackground = require('../assets/lockup-for-light-bg.png');
+/** Dark UI — `04-lockup-dark` (mark + light “Research” on transparent). */
+const logoForDarkBackground = require('../assets/lockup-for-dark-bg.png');
 
 type Props = {
-  /** Total width of the wordmark (height derived from asset aspect ratio). */
+  /** Display width of the lockup (height follows ~986:146 trimmed asset). */
   width?: number;
   containerStyle?: StyleProp<ViewStyle>;
   imageStyle?: StyleProp<ImageStyle>;
 };
 
 export function ResearchLogo({
-  width = 240,
+  width = 272,
   containerStyle,
   imageStyle,
 }: Props) {
@@ -50,6 +52,8 @@ export function ResearchLogo({
 
 const styles = StyleSheet.create({
   wrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
     alignSelf: 'center',
   },
   image: {

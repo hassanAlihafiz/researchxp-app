@@ -7,6 +7,11 @@ import { MainDrawerNavigator } from './MainDrawerNavigator';
 import LoginScreen from '../screens/auth/LoginScreen';
 import RegisterScreen from '../screens/auth/RegisterScreen';
 import VerifyEmailScreen from '../screens/auth/VerifyEmailScreen';
+import WelcomeScreen from '../screens/auth/WelcomeScreen';
+import EmailSignUpScreen from '../screens/auth/EmailSignUpScreen';
+import Layer0OnboardingScreen from '../screens/onboarding/Layer0OnboardingScreen';
+import ValuePrimerScreen from '../screens/onboarding/ValuePrimerScreen';
+import WelcomeRewardScreen from '../screens/onboarding/WelcomeRewardScreen';
 import ForgotPasswordEmailScreen from '../screens/auth/ForgotPasswordEmailScreen';
 import ForgotPasswordCodeScreen from '../screens/auth/ForgotPasswordCodeScreen';
 import ForgotPasswordNewScreen from '../screens/auth/ForgotPasswordNewScreen';
@@ -48,6 +53,31 @@ export function RootNavigator() {
           name="Splash"
           component={SplashScreen}
           options={{ headerShown: false, animation: 'fade' }}
+        />
+        <Stack.Screen
+          name="Welcome"
+          component={WelcomeScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="EmailSignUp"
+          component={EmailSignUpScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="OnboardingLayer0"
+          component={Layer0OnboardingScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="OnboardingValuePrimer"
+          component={ValuePrimerScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
+        />
+        <Stack.Screen
+          name="OnboardingWelcomeReward"
+          component={WelcomeRewardScreen}
+          options={{ headerShown: false, gestureEnabled: false }}
         />
         <Stack.Screen
           name="Login"

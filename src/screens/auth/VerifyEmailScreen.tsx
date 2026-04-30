@@ -16,6 +16,7 @@ import {
 import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
+import { replaceStackAfterAuth } from '../../navigation/afterAuthNavigation';
 import type { RootStackParamList } from '../../navigation/types';
 import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
@@ -173,7 +174,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
         token: result.token,
         user: result.user,
       });
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      replaceStackAfterAuth(navigation, result.user);
     } finally {
       setLoading(false);
     }
@@ -201,7 +202,7 @@ const VerifyEmailScreen = ({ navigation, route }: Props) => {
   };
 
   return (
-    <AuthScreenShell logoWidth={220}>
+    <AuthScreenShell>
       <Text style={styles.title}>{t('verify.title')}</Text>
       <Text style={styles.subtitle}>
         {t('verify.subtitleBefore')}

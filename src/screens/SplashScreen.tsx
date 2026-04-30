@@ -10,6 +10,10 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../auth/AuthContext';
 import { ResearchLogo } from '../components/ResearchLogo';
+import {
+  userNeedsLayer0,
+  userNeedsPostLayer0Welcome,
+} from '../onboarding/userNeedsLayer0';
 import type { RootStackParamList } from '../navigation/types';
 import { useLocale } from '../locale';
 import { useAppTheme } from '../theme/ThemeContext';
@@ -20,7 +24,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Splash'>;
 
 export default function SplashScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
-  const { isSignedIn, ready } = useAuth();
+  const { isSignedIn, ready, user } = useAuth();
   const { colors } = useAppTheme();
   const { t } = useLocale();
   const opacity = useRef(new Animated.Value(0)).current;
@@ -71,13 +75,21 @@ export default function SplashScreen({ navigation }: Props) {
     }
     const id = setTimeout(() => {
       if (isSignedIn) {
+        if (userNeedsLayer0(user ?? undefined)) {
+          navigation.reset({ index: 0, routes: [{ name: 'OnboardingLayer0' }] });
+          return;
+        }
+        if (userNeedsPostLayer0Welcome(user ?? undefined)) {
+          navigation.reset({ index: 0, routes: [{ name: 'OnboardingValuePrimer' }] });
+          return;
+        }
         navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
       } else {
-        navigation.replace('Login');
+        navigation.replace('Welcome');
       }
     }, MIN_DISPLAY_MS);
     return () => clearTimeout(id);
-  }, [ready, isSignedIn, navigation]);
+  }, [ready, isSignedIn, user, navigation]);
 
   return (
     <ScrollView
@@ -88,7 +100,7 @@ export default function SplashScreen({ navigation }: Props) {
       ]}
       showsVerticalScrollIndicator={false}>
       <Animated.View style={[styles.content, { opacity }]}>
-        <ResearchLogo width={280} containerStyle={styles.logo} />
+        <ResearchLogo width={296} containerStyle={styles.logo} />
         <Text style={styles.tagline}>{t('splash.tagline')}</Text>
         <ActivityIndicator
           style={styles.spinner}

@@ -123,7 +123,7 @@ export default function ForgotPasswordNewScreen({ navigation, route }: Props) {
   };
 
   return (
-    <AuthScreenShell logoWidth={220}>
+    <AuthScreenShell>
       <Text style={styles.title}>{t('forgotNew.title')}</Text>
       <Text style={styles.subtitle}>
         {t('forgotNew.subtitleBefore')}
