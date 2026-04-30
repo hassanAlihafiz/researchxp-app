@@ -55,6 +55,15 @@ export async function loginWithPassword(
         token: obj.token,
       };
     }
+    if (res.status === 401 && obj?.error === 'oauth_account') {
+      return {
+        ok: false,
+        message:
+          typeof obj.message === 'string'
+            ? obj.message
+            : 'This account uses Apple or Google sign-in.',
+      };
+    }
     if (res.status === 403 && obj?.error === 'email_not_verified') {
       appLog('api', 'login needs email verification', { status: res.status, email: trimmed });
       return {
@@ -272,6 +281,79 @@ export async function resendVerificationEmail(email: string): Promise<ResendVeri
     const message =
       e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
     appLog('api', 'resend-verification network error', { error: message });
+    return { ok: false, message };
+  }
+}
+
+export type OAuthLoginResult =
+  | { ok: true; user: RegisteredAppUser; token: string }
+  | { ok: false; message: string };
+
+export async function oauthApple(
+  identityToken: string,
+  fullName?: { givenName?: string; familyName?: string },
+): Promise<OAuthLoginResult> {
+  appLog('api', 'POST /api/auth/oauth/apple', {});
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/oauth/apple`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ identityToken, fullName }),
+    });
+    const obj = await parseJsonResponse(res);
+    if (
+      (res.status === 200 || res.status === 201) &&
+      obj &&
+      typeof obj.token === 'string' &&
+      obj.user &&
+      typeof obj.user === 'object'
+    ) {
+      return { ok: true, user: obj.user as RegisteredAppUser, token: obj.token };
+    }
+    const errMsg =
+      (typeof obj?.message === 'string' ? obj.message : '') ||
+      (typeof obj?.error === 'string' ? obj.error : '') ||
+      `Request failed (${res.status}).`;
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
+    return { ok: false, message };
+  }
+}
+
+export async function oauthGoogle(idToken: string): Promise<OAuthLoginResult> {
+  appLog('api', 'POST /api/auth/oauth/google', {});
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/auth/oauth/google`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ idToken }),
+    });
+    const obj = await parseJsonResponse(res);
+    if (
+      (res.status === 200 || res.status === 201) &&
+      obj &&
+      typeof obj.token === 'string' &&
+      obj.user &&
+      typeof obj.user === 'object'
+    ) {
+      return { ok: true, user: obj.user as RegisteredAppUser, token: obj.token };
+    }
+    const errMsg =
+      (typeof obj?.message === 'string' ? obj.message : '') ||
+      (typeof obj?.error === 'string' ? obj.error : '') ||
+      `Request failed (${res.status}).`;
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
     return { ok: false, message };
   }
 }

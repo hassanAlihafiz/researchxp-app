@@ -14,8 +14,9 @@ import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
 import { PasswordField } from '../../components/PasswordField';
-import type { RootStackParamList } from '../../navigation/types';
 import { useLocale } from '../../locale';
+import { replaceStackAfterAuth } from '../../navigation/afterAuthNavigation';
+import type { RootStackParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
@@ -148,7 +149,7 @@ const LoginScreen = ({ navigation }: Props) => {
           token: result.token,
           user: result.user,
         });
-        navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+        replaceStackAfterAuth(navigation, result.user);
         return;
       }
 
@@ -181,7 +182,7 @@ const LoginScreen = ({ navigation }: Props) => {
   };
 
   return (
-    <AuthScreenShell logoWidth={220}>
+    <AuthScreenShell>
       <Text style={styles.title}>{t('login.title')}</Text>
       <Text style={styles.subtitle}>{t('login.subtitle')}</Text>
 
@@ -234,7 +235,7 @@ const LoginScreen = ({ navigation }: Props) => {
       <View style={styles.footer}>
         <Text style={styles.footerText}>{t('login.footerNew')}</Text>
         <AppPressable
-          onPress={() => navigation.navigate('Register')}
+          onPress={() => navigation.navigate('Welcome')}
           disabled={loading}
           hitSlop={12}>
           <Text style={styles.footerLink}>{t('login.footerCreate')}</Text>

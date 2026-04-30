@@ -14,6 +14,11 @@ type Props = {
   testID?: string;
   /** Called when the text field is focused (e.g. scroll field to center). */
   onInputFocus?: () => void;
+  /**
+   * Turn off iOS Automatic Strong Password / autofill overlays on create-account flows.
+   * Login and “change password” screens should omit this (keep default).
+   */
+  suppressIosStrongPassword?: boolean;
 };
 
 export function PasswordField({
@@ -23,6 +28,7 @@ export function PasswordField({
   colors,
   editable = true,
   onInputFocus,
+  suppressIosStrongPassword = false,
 }: Props) {
   const [visible, setVisible] = useState(false);
 
@@ -56,6 +62,8 @@ export function PasswordField({
     [colors],
   );
 
+  const autofillOff = suppressIosStrongPassword;
+
   return (
     <View style={styles.wrap}>
       <TextInput
@@ -69,7 +77,11 @@ export function PasswordField({
         editable={editable}
         autoCapitalize="none"
         autoCorrect={false}
-        textContentType="password"
+        textContentType={autofillOff ? 'none' : 'password'}
+        {...(Platform.OS === 'ios' && autofillOff ? { passwordRules: '' } : {})}
+        {...(Platform.OS === 'android' && autofillOff
+          ? { importantForAutofill: 'no' as const, autoComplete: 'off' as const }
+          : {})}
       />
       <AppPressable
         style={styles.eye}

@@ -1,5 +1,10 @@
 export type RootStackParamList = {
   Splash: undefined;
+  Welcome: undefined;
+  EmailSignUp: undefined;
+  OnboardingLayer0: undefined;
+  OnboardingValuePrimer: undefined;
+  OnboardingWelcomeReward: undefined;
   Login: undefined;
   Register: undefined;
   VerifyEmail: { email: string };

@@ -30,44 +30,56 @@ async function readJson(
   }
 }
 
+export function parseAssignmentRow(
+  row: unknown,
+): MemberSurveyAssignment | null {
+  if (!row || typeof row !== 'object') {
+    return null;
+  }
+  const o = row as Record<string, unknown>;
+  if (o.id == null || o.project_id == null) {
+    return null;
+  }
+  const projectId = Number(o.project_id);
+  if (!Number.isFinite(projectId)) {
+    return null;
+  }
+  return {
+    id: o.id as string | number,
+    project_id: projectId,
+    status:
+      typeof o.status === 'string'
+        ? o.status
+        : o.status == null
+          ? null
+          : String(o.status),
+    reward_points:
+      o.reward_points == null || o.reward_points === ''
+        ? null
+        : Number(o.reward_points),
+    reward_amount: (o.reward_amount ?? null) as string | number | null,
+    completed_at: typeof o.completed_at === 'string' ? o.completed_at : null,
+    project_code:
+      o.project_code == null || o.project_code === ''
+        ? null
+        : String(o.project_code),
+    project_name: typeof o.project_name === 'string' ? o.project_name : null,
+    project_survey_name:
+      typeof o.project_survey_name === 'string' ? o.project_survey_name : null,
+    survey_url: typeof o.survey_url === 'string' ? o.survey_url : null,
+  };
+}
+
 function parseAssignments(raw: unknown): MemberSurveyAssignment[] {
   if (!Array.isArray(raw)) {
     return [];
   }
   const out: MemberSurveyAssignment[] = [];
   for (const row of raw) {
-    if (!row || typeof row !== 'object') {
-      continue;
+    const a = parseAssignmentRow(row);
+    if (a) {
+      out.push(a);
     }
-    const o = row as Record<string, unknown>;
-    if (o.id == null || o.project_id == null) {
-      continue;
-    }
-    const projectId = Number(o.project_id);
-    if (!Number.isFinite(projectId)) {
-      continue;
-    }
-    out.push({
-      id: o.id as string | number,
-      project_id: projectId,
-      status:
-        typeof o.status === 'string'
-          ? o.status
-          : o.status == null
-            ? null
-            : String(o.status),
-      reward_points:
-        o.reward_points == null || o.reward_points === ''
-          ? null
-          : Number(o.reward_points),
-      reward_amount: (o.reward_amount ?? null) as string | number | null,
-      completed_at: typeof o.completed_at === 'string' ? o.completed_at : null,
-      project_code: typeof o.project_code === 'string' ? o.project_code : null,
-      project_name: typeof o.project_name === 'string' ? o.project_name : null,
-      project_survey_name:
-        typeof o.project_survey_name === 'string' ? o.project_survey_name : null,
-      survey_url: typeof o.survey_url === 'string' ? o.survey_url : null,
-    });
   }
   return out;
 }

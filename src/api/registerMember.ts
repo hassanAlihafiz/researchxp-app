@@ -38,6 +38,14 @@ export type RegisteredAppUser = {
   zip_code: string | null;
   marital_status: string | null;
   created_at: string;
+  /** Set when Layer 0 onboarding is finished (spec). */
+  layer0_completed_at?: string | null;
+  welcome_bonus_credited_at?: string | null;
+  first_study_completed_at?: string | null;
+  impact_card_dismissed_at?: string | null;
+  archetype?: string | null;
+  primary_language?: string | null;
+  consent_version?: string | null;
 };
 
 export type RegisterMemberResult =
@@ -115,6 +123,69 @@ export async function registerMember(
     const message =
       e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
     appLog('api', 'register network error', { error: message });
+    return { ok: false, message };
+  }
+}
+
+/** Layer 0 spec: email + password + display name only; demographics come later. */
+export async function registerMemberMinimal(payload: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<RegisterMemberResult> {
+  const body = {
+    name: payload.name.trim(),
+    email: payload.email.trim().toLowerCase(),
+    password: payload.password,
+    minimal: true,
+  };
+  appLog('api', 'POST /api/members minimal (password omitted)', {
+    email: body.email,
+    name: body.name,
+  });
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/members`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+
+    const text = await res.text();
+    let data: unknown = null;
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      return {
+        ok: false,
+        message: 'Invalid response from server.',
+      };
+    }
+
+    const obj = data && typeof data === 'object' ? (data as Record<string, unknown>) : null;
+
+    if (res.ok && obj && 'user' in obj && obj.user && typeof obj.user === 'object') {
+      const u = obj.user as RegisteredAppUser;
+      appLog('api', 'register minimal OK', {
+        status: res.status,
+        email: u.email,
+        verified: u.verified,
+      });
+      return { ok: true, user: u };
+    }
+
+    const errMsg =
+      obj && typeof obj.error === 'string'
+        ? obj.error
+        : `Request failed (${res.status}).`;
+    appLog('api', 'register minimal failed', { status: res.status, error: errMsg });
+    return { ok: false, message: errMsg };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : 'Network error. Check your connection and API URL.';
+    appLog('api', 'register minimal network error', { error: message });
     return { ok: false, message };
   }
 }

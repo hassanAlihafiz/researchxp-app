@@ -7,7 +7,8 @@ import { ResearchLogo } from '../components/ResearchLogo';
 import { useLocale } from '../locale';
 import { useAppTheme } from '../theme/ThemeContext';
 
-const HEADER_LOGO_WIDTH = 148;
+/** Lockup (mark + wordmark) needs more width than wordmark-only for the same visual weight. */
+const HEADER_LOGO_WIDTH = 168;
 
 /** Main tabs (Home, Rewards, Profile): ☰ left, logo, notifications bell right. */
 export function MainTabHeaderLeading() {

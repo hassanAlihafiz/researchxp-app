@@ -32,7 +32,7 @@ type Props = {
 
 export function AuthScreenShell({
   children,
-  logoWidth = 220,
+  logoWidth = 272,
   contentContainerStyle,
   scrollViewRef,
   onScrollViewLayout,
@@ -112,6 +112,11 @@ export function AuthScreenShell({
           paddingBottom: Math.max(insets.bottom, 24) + 48,
           flexGrow: 1,
         },
+        brandLogoSlot: {
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
       }),
     [colors, insets.top, insets.bottom, keyboardOpen],
   );
@@ -119,7 +124,9 @@ export function AuthScreenShell({
   return (
     <View style={styles.root}>
       <View style={styles.brand}>
-        <ResearchLogo width={logoWidth} />
+        <View style={styles.brandLogoSlot}>
+          <ResearchLogo width={logoWidth} />
+        </View>
       </View>
       <View style={styles.lower}>
         <KeyboardAvoidingView

@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import type { AppPalette, ColorScheme } from '../../theme/palettes';
 
 export function createHomeStyles(colors: AppPalette, _scheme: ColorScheme) {
-  /** Solid brand orange on both schemes (reference balance card) */
+  /** Hero card uses primary CTA color (Pulse cyan / royal) */
   const heroBackground = colors.primary;
   const heroBorder = 'rgba(255,255,255,0.28)';
   const heroLabel = 'rgba(255,255,255,0.95)';
@@ -46,7 +46,7 @@ export function createHomeStyles(colors: AppPalette, _scheme: ColorScheme) {
     balanceValueRewardsHeroOnly: {
       marginBottom: 0,
     },
-    /** Rewards: two-up stats row inside orange hero */
+    /** Rewards: two-up stats row inside balance hero */
     balanceHeroStatsRow: {
       flexDirection: 'row',
       marginTop: 18,

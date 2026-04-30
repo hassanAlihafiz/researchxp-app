@@ -360,7 +360,6 @@ const RegisterScreen = ({ navigation }: Props) => {
 
   return (
     <AuthScreenShell
-      logoWidth={220}
       scrollViewRef={scrollRef}
       onScrollViewLayout={onScrollViewLayout}
       contentContainerStyle={registerScrollPadding}>
@@ -406,6 +405,7 @@ const RegisterScreen = ({ navigation }: Props) => {
           colors={colors}
           editable={!loading}
           onInputFocus={() => scheduleCenterField(passwordFieldRef)}
+          suppressIosStrongPassword
         />
       </View>
 
@@ -418,6 +418,7 @@ const RegisterScreen = ({ navigation }: Props) => {
           colors={colors}
           editable={!loading}
           onInputFocus={() => scheduleCenterField(confirmFieldRef)}
+          suppressIosStrongPassword
         />
       </View>
 

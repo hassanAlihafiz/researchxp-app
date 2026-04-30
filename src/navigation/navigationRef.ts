@@ -3,28 +3,28 @@ import type { RootStackParamList } from './types';
 
 export const navigationRef = createNavigationContainerRef<RootStackParamList>();
 
-function tryResetToLogin(): boolean {
+function tryResetToWelcome(): boolean {
   if (!navigationRef.isReady()) {
     return false;
   }
   navigationRef.reset({
     index: 0,
-    routes: [{ name: 'Login' }],
+    routes: [{ name: 'Welcome' }],
   });
   return true;
 }
 
-/** Clears the stack and shows Login (e.g. after sign-out or account deletion). */
+/** Clears the stack and shows Welcome (e.g. after sign-out or account deletion). */
 export function resetToLogin() {
-  if (tryResetToLogin()) {
+  if (tryResetToWelcome()) {
     return;
   }
   requestAnimationFrame(() => {
-    if (tryResetToLogin()) {
+    if (tryResetToWelcome()) {
       return;
     }
     setTimeout(() => {
-      tryResetToLogin();
+      tryResetToWelcome();
     }, 50);
   });
 }

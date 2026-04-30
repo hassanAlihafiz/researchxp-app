@@ -9,21 +9,26 @@ import {
   View,
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { requestForgotPassword } from '../../api/auth';
+import { registerMemberMinimal } from '../../api/registerMember';
 import { AppPressable } from '../../components/AppPressable';
 import { AuthScreenShell } from '../../components/AuthScreenShell';
+import { PasswordField } from '../../components/PasswordField';
 import type { RootStackParamList } from '../../navigation/types';
 import { useLocale } from '../../locale';
 import { useAppTheme } from '../../theme/ThemeContext';
 
+type Props = NativeStackScreenProps<RootStackParamList, 'EmailSignUp'>;
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MIN_PASSWORD = 8;
 
-type Props = NativeStackScreenProps<RootStackParamList, 'ForgotPasswordEmail'>;
-
-export default function ForgotPasswordEmailScreen({ navigation }: Props) {
+export default function EmailSignUpScreen({ navigation }: Props) {
   const { colors } = useAppTheme();
   const { t } = useLocale();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
 
   const styles = useMemo(
@@ -31,7 +36,7 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
       StyleSheet.create({
         title: {
           fontSize: 28,
-          fontWeight: '700',
+          fontWeight: '800',
           letterSpacing: -0.5,
           color: colors.text,
           marginBottom: 8,
@@ -73,7 +78,7 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
           fontWeight: '600',
         },
         footer: {
-          marginTop: 28,
+          marginTop: 24,
           alignItems: 'center',
         },
         footerLink: {
@@ -86,19 +91,35 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
   );
 
   const onSubmit = async () => {
-    const trimmed = email.trim().toLowerCase();
-    if (!trimmed || !EMAIL_RE.test(trimmed)) {
-      Alert.alert(t('forgotEmail.alertInvalidTitle'), t('forgotEmail.alertInvalidBody'));
+    const n = name.trim();
+    const em = email.trim().toLowerCase();
+    if (!n) {
+      Alert.alert(t('emailSignUp.title'), t('emailSignUp.displayName'));
+      return;
+    }
+    if (!EMAIL_RE.test(em)) {
+      Alert.alert(t('login.alertInvalidEmailTitle'), t('login.alertInvalidEmailBody'));
+      return;
+    }
+    if (password.length < MIN_PASSWORD) {
+      Alert.alert(
+        t('login.alertPasswordShortTitle'),
+        t('login.alertPasswordShortBody', { min: MIN_PASSWORD }),
+      );
+      return;
+    }
+    if (password !== confirm) {
+      Alert.alert(t('register.alertMismatchTitle'), t('register.alertMismatchBody'));
       return;
     }
     setLoading(true);
     try {
-      const result = await requestForgotPassword(trimmed);
-      if (!result.ok) {
-        Alert.alert(t('forgotEmail.alertRequestFailedTitle'), result.message);
+      const res = await registerMemberMinimal({ name: n, email: em, password });
+      if (!res.ok) {
+        Alert.alert(t('register.alertRegistrationFailedTitle'), res.message);
         return;
       }
-      navigation.navigate('ForgotPasswordCode', { email: trimmed });
+      navigation.navigate('VerifyEmail', { email: em });
     } finally {
       setLoading(false);
     }
@@ -106,11 +127,23 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
 
   return (
     <AuthScreenShell>
-      <Text style={styles.title}>{t('forgotEmail.title')}</Text>
-      <Text style={styles.subtitle}>{t('forgotEmail.subtitle')}</Text>
+      <Text style={styles.title}>{t('emailSignUp.title')}</Text>
+      <Text style={styles.subtitle}>{t('emailSignUp.subtitle')}</Text>
 
       <View style={styles.field}>
-        <Text style={styles.label}>{t('common.email')}</Text>
+        <Text style={styles.label}>{t('emailSignUp.displayName')}</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder={t('emailSignUp.namePh')}
+          placeholderTextColor={colors.placeholder}
+          autoCapitalize="words"
+          editable={!loading}
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>{t('emailSignUp.email')}</Text>
         <TextInput
           style={styles.input}
           value={email}
@@ -118,9 +151,31 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
-          placeholder={t('login.emailPlaceholder')}
+          placeholder={t('emailSignUp.emailPh')}
           placeholderTextColor={colors.placeholder}
           editable={!loading}
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>{t('emailSignUp.password')}</Text>
+        <PasswordField
+          value={password}
+          onChangeText={setPassword}
+          placeholder={t('emailSignUp.passwordPh')}
+          colors={colors}
+          editable={!loading}
+          suppressIosStrongPassword
+        />
+      </View>
+      <View style={styles.field}>
+        <Text style={styles.label}>{t('emailSignUp.confirm')}</Text>
+        <PasswordField
+          value={confirm}
+          onChangeText={setConfirm}
+          placeholder={t('register.confirmPlaceholder')}
+          colors={colors}
+          editable={!loading}
+          suppressIosStrongPassword
         />
       </View>
 
@@ -131,13 +186,13 @@ export default function ForgotPasswordEmailScreen({ navigation }: Props) {
         {loading ? (
           <ActivityIndicator color={colors.onPrimary} />
         ) : (
-          <Text style={styles.buttonText}>{t('forgotEmail.sendCode')}</Text>
+          <Text style={styles.buttonText}>{t('emailSignUp.create')}</Text>
         )}
       </AppPressable>
 
       <View style={styles.footer}>
         <AppPressable onPress={() => navigation.navigate('Login')} disabled={loading} hitSlop={12}>
-          <Text style={styles.footerLink}>{t('forgotEmail.backToSignIn')}</Text>
+          <Text style={styles.footerLink}>{t('emailSignUp.haveAccount')}</Text>
         </AppPressable>
       </View>
     </AuthScreenShell>
