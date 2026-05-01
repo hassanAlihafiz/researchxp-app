@@ -20,7 +20,7 @@ export function userNeedsLayer0(
 }
 
 /**
- * Value primer + welcome moment (§5.4.7): after Layer 0, before Main, until welcome credit is claimed.
+ * Value primer + welcome moment screen: after Layer 0 until POST claim-welcome-moment (welcome_moment_claimed_at).
  */
 export function userNeedsPostLayer0Welcome(
   user: RegisteredAppUser | null | undefined,
@@ -28,7 +28,7 @@ export function userNeedsPostLayer0Welcome(
   if (!user?.layer0_completed_at) {
     return false;
   }
-  if (user.welcome_bonus_credited_at) {
+  if (user.welcome_moment_claimed_at) {
     return false;
   }
   return true;

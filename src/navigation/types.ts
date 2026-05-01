@@ -12,6 +12,7 @@ export type RootStackParamList = {
   ForgotPasswordCode: { email: string };
   ForgotPasswordNew: { email: string; code: string };
   Main: undefined;
+  InternalSurvey: { assignmentId: number };
 };
 
 export type MainDrawerParamList = {

@@ -388,7 +388,7 @@ export default function Layer0OnboardingScreen({ navigation }: Props) {
             style={styles.input}
             value={smsCode}
             onChangeText={setSmsCode}
-            placeholder="123456"
+            placeholder={t('onboarding.otpPlaceholder')}
             placeholderTextColor={colors.placeholder}
             keyboardType="number-pad"
             maxLength={10}

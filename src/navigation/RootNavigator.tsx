@@ -16,6 +16,7 @@ import ForgotPasswordEmailScreen from '../screens/auth/ForgotPasswordEmailScreen
 import ForgotPasswordCodeScreen from '../screens/auth/ForgotPasswordCodeScreen';
 import ForgotPasswordNewScreen from '../screens/auth/ForgotPasswordNewScreen';
 import SplashScreen from '../screens/SplashScreen';
+import InternalSurveyScreen from '../screens/survey/InternalSurveyScreen';
 import { useAppTheme } from '../theme/ThemeContext';
 import { appLog } from '../utils/appLog';
 
@@ -115,6 +116,13 @@ export function RootNavigator() {
           options={{
             headerShown: false,
             gestureEnabled: false,
+          }}
+        />
+        <Stack.Screen
+          name="InternalSurvey"
+          component={InternalSurveyScreen}
+          options={{
+            title: 'Study',
           }}
         />
       </Stack.Navigator>
