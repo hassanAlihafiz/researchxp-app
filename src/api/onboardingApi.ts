@@ -51,7 +51,7 @@ export async function completeLayer0(
   }
 }
 
-/** Twilio Verify when configured on server; otherwise server returns mock mode (no SMS). */
+/** Twilio SMS OTP when server has TWILIO_* + TWILIO_PHONE_NUMBER; otherwise mock start (no SMS) — complete-layer0 needs that SMS code or MOCK_SMS_OTP if set. */
 export async function startPhoneVerification(
   token: string,
   phone: string,

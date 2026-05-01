@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Linking,
   StyleSheet,
   Text,
@@ -15,6 +16,7 @@ import { AppPressable } from '../../components/AppPressable';
 import { useLocale } from '../../locale';
 import type { RootStackParamList } from '../../navigation/types';
 import { useAppTheme } from '../../theme/ThemeContext';
+import { fetchSurveyStart } from '../../api/surveyStart';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'OnboardingWelcomeReward'>;
 
@@ -27,20 +29,13 @@ function studyTitle(a: MemberSurveyAssignment): string {
   );
 }
 
-function openSurveyUrl(url: string): void {
-  const u = url.trim();
-  if (!/^https?:\/\//i.test(u)) {
-    return;
-  }
-  Linking.openURL(u).catch(() => {});
-}
-
 export default function WelcomeRewardScreen({ navigation }: Props) {
   const insets = useSafeAreaInsets();
   const { colors } = useAppTheme();
   const { t } = useLocale();
   const { token, updateSessionUser } = useAuth();
   const [busy, setBusy] = useState(true);
+  const [openBusy, setOpenBusy] = useState(false);
   const [assignment, setAssignment] = useState<MemberSurveyAssignment | null>(null);
   const [credited, setCredited] = useState(false);
   const [bonusCents, setBonusCents] = useState(0);
@@ -76,6 +71,39 @@ export default function WelcomeRewardScreen({ navigation }: Props) {
       cancelled = true;
     };
   }, [token, updateSessionUser]);
+
+  const openSuggestedStudy = useCallback(async () => {
+    if (!token || !assignment) {
+      return;
+    }
+    const idNum = Number(assignment.id);
+    if (!Number.isFinite(idNum)) {
+      return;
+    }
+    setOpenBusy(true);
+    try {
+      const res = await fetchSurveyStart(token, idNum);
+      if (!res.ok) {
+        Alert.alert(
+          t('survey.alertOpenFailedTitle'),
+          res.message || t('survey.loadError'),
+        );
+        return;
+      }
+      if (res.data.internal_questions && res.data.screens?.length) {
+        navigation.navigate('InternalSurvey', { assignmentId: idNum });
+        return;
+      }
+      const u = (res.data.survey_url || '').trim();
+      if (u && /^https?:\/\//i.test(u)) {
+        Linking.openURL(u).catch(() => {});
+        return;
+      }
+      Alert.alert(t('survey.alertOpenFailedTitle'), t('survey.loadError'));
+    } finally {
+      setOpenBusy(false);
+    }
+  }, [token, assignment, navigation, t]);
 
   const styles = useMemo(
     () =>
@@ -157,8 +185,7 @@ export default function WelcomeRewardScreen({ navigation }: Props) {
     [colors, insets],
   );
 
-  const url = (assignment?.survey_url || '').trim();
-  const canOpen = Boolean(url && /^https?:\/\//i.test(url));
+  const hasAssignment = Boolean(assignment && Number.isFinite(Number(assignment.id)));
   const bonusDisplay =
     credited && bonusCents > 0
       ? new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
@@ -184,7 +211,9 @@ export default function WelcomeRewardScreen({ navigation }: Props) {
           {welcomeError ? (
             <Text style={styles.warn}>
               {welcomeError.toLowerCase().includes('not configured') ||
-              welcomeError.toLowerCase().includes('welcome bonus')
+              welcomeError.toLowerCase().includes('fully configured') ||
+              welcomeError.toLowerCase().includes('welcome bonus') ||
+              welcomeError.toLowerCase().includes('first survey')
                 ? t('onboarding.welcomeRewardConfigHint')
                 : welcomeError}
             </Text>
@@ -195,15 +224,24 @@ export default function WelcomeRewardScreen({ navigation }: Props) {
               <Text style={styles.cardTitle}>{studyTitle(assignment)}</Text>
             </View>
           ) : null}
-          {canOpen ? (
-            <AppPressable style={styles.primary} onPress={() => openSurveyUrl(url)}>
-              <Text style={styles.primaryTxt}>{t('onboarding.welcomeRewardOpenStudy')}</Text>
+          {hasAssignment ? (
+            <AppPressable
+              style={[styles.primary, openBusy ? { opacity: 0.7 } : null]}
+              disabled={openBusy}
+              onPress={() => {
+                void openSuggestedStudy();
+              }}>
+              {openBusy ? (
+                <ActivityIndicator color={colors.onPrimary} />
+              ) : (
+                <Text style={styles.primaryTxt}>{t('onboarding.welcomeRewardOpenStudy')}</Text>
+              )}
             </AppPressable>
           ) : null}
           <AppPressable style={styles.primary} onPress={goMain}>
             <Text style={styles.primaryTxt}>{t('onboarding.welcomeRewardToHome')}</Text>
           </AppPressable>
-          {canOpen ? (
+          {hasAssignment ? (
             <AppPressable style={styles.secondary} onPress={goMain} hitSlop={12}>
               <Text style={styles.secondaryTxt}>{t('onboarding.welcomeRewardSkipOpen')}</Text>
             </AppPressable>

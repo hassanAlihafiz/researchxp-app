@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Alert,
 } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
@@ -21,6 +22,7 @@ import {
   fetchMySurveyAssignments,
   type MemberSurveyAssignment,
 } from '../../api/memberSurveyAssignments';
+import { fetchSurveyStart } from '../../api/surveyStart';
 import {
   dismissImpactCardRequest,
   fetchImpactCard,
@@ -29,6 +31,7 @@ import {
 import { useAuth } from '../../auth/AuthContext';
 import { AppPressable } from '../../components/AppPressable';
 import { createHomeStyles } from './createHomeStyles';
+import { navigationRef } from '../../navigation/navigationRef';
 
 type Props = BottomTabScreenProps<MainTabParamList, 'Home'>;
 
@@ -83,6 +86,7 @@ export default function HomeScreen(_props: Props) {
   const [showAllSurveyRows, setShowAllSurveyRows] = useState(false);
   const [impactCard, setImpactCard] = useState<ImpactCardApiPayload | null>(null);
   const [impactBusy, setImpactBusy] = useState(false);
+  const [openingAssignmentId, setOpeningAssignmentId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -179,6 +183,44 @@ export default function HomeScreen(_props: Props) {
     await dismissImpactUi();
   }, [navigation, dismissImpactUi]);
 
+  const openAssignmentSurvey = useCallback(
+    async (a: MemberSurveyAssignment) => {
+      if (!token) {
+        return;
+      }
+      const idNum = Number(a.id);
+      if (!Number.isFinite(idNum)) {
+        return;
+      }
+      setOpeningAssignmentId(String(a.id));
+      try {
+        const res = await fetchSurveyStart(token, idNum);
+        if (!res.ok) {
+          Alert.alert(
+            t('survey.alertOpenFailedTitle'),
+            res.message || t('survey.loadError'),
+          );
+          return;
+        }
+        if (res.data.internal_questions && res.data.screens?.length) {
+          if (navigationRef.isReady()) {
+            navigationRef.navigate('InternalSurvey', { assignmentId: idNum });
+          }
+          return;
+        }
+        const url = (res.data.survey_url || '').trim();
+        if (url && /^https?:\/\//i.test(url)) {
+          openSurveyUrl(url);
+          return;
+        }
+        Alert.alert(t('survey.alertOpenFailedTitle'), t('survey.loadError'));
+      } finally {
+        setOpeningAssignmentId(null);
+      }
+    },
+    [token, t],
+  );
+
   const list = useMemo(() => assignments ?? [], [assignments]);
   const openList = useMemo(
     () => list.filter(a => !isAssignmentCompleted(a.status)),
@@ -255,31 +297,28 @@ export default function HomeScreen(_props: Props) {
 
       {surveysToShow.map(a => {
         const xp = Number(a.reward_points ?? 0);
-        const url = (a.survey_url || '').trim();
-        const canOpen = Boolean(url && /^https?:\/\//i.test(url));
+        const busy = openingAssignmentId === String(a.id);
         const subtitle = t('home.surveyEstimatedTimeVaries');
 
         return (
           <AppPressable
             key={String(a.id)}
-            accessibilityRole={canOpen ? 'button' : undefined}
-            accessibilityLabel={
-              canOpen
-                ? `${assignmentTitle(a, t)}, ${t('home.openSurveyA11y')}`
-                : assignmentTitle(a, t)
-            }
+            accessibilityRole="button"
+            accessibilityLabel={`${assignmentTitle(a, t)}, ${t('home.openSurveyA11y')}`}
             onPress={() => {
-              if (canOpen) {
-                openSurveyUrl(url);
+              if (isAssignmentCompleted(a.status) || busy) {
+                return;
               }
+              void openAssignmentSurvey(a);
             }}
-            style={styles.surveyRow}>
+            disabled={isAssignmentCompleted(a.status) || busy}
+            style={[styles.surveyRow, busy ? { opacity: 0.7 } : null]}>
             <View style={styles.surveyTexts}>
               <Text style={styles.surveyTitle} numberOfLines={2}>
                 {assignmentTitle(a, t)}
               </Text>
               <Text style={styles.surveySubtitle} numberOfLines={1}>
-                {subtitle}
+                {busy ? t('survey.openingStudy') : subtitle}
               </Text>
             </View>
             <Text style={styles.surveyXp}>

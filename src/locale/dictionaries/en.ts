@@ -71,7 +71,8 @@ export const en: MessageBranch = {
     phoneLabel: 'Mobile number (E.164)',
     phonePh: '+15551234567',
     otpLabel: 'SMS code',
-    otpHint: 'Dev builds: use 123456 if SMS is not configured.',
+    otpPlaceholder: '000000',
+    otpHint: 'Enter the code from your SMS.',
     sendSms: 'Send verification code',
     sendSmsFail: 'Could not send SMS.',
     archetypeTitle: 'Which sounds most like you?',
@@ -117,14 +118,14 @@ export const en: MessageBranch = {
     valuePrimerSkip: 'Skip',
     welcomeRewardTitle: 'You’re in. Here’s your head start.',
     welcomeRewardBody:
-      'We picked a study that matches your profile. Open it when you’re ready — your rewards stay in your account either way.',
-    welcomeRewardCreditLine: 'Welcome bonus added to your wallet.',
+      'We picked a study that matches your profile. Complete it to earn your one-time reward, then explore more studies from Home.',
+    welcomeRewardCreditLine: 'Your reward was added to your wallet.',
     welcomeRewardPickLabel: 'Suggested first study',
     welcomeRewardOpenStudy: 'Open study',
     welcomeRewardToHome: 'Go to home',
     welcomeRewardSkipOpen: 'I’ll open it later',
     welcomeRewardConfigHint:
-      'The welcome bonus isn’t enabled on this server yet. You can still start studies from Home when they’re available.',
+      'This onboarding step isn’t fully configured on this server yet. You can still start studies from Home when they’re available.',
     impactModalTitle: 'You’re already earning insight value',
     impactModalBody:
       'Every study you finish makes your profile more valuable to brands — and increases what you can earn over time.',
@@ -348,6 +349,24 @@ export const en: MessageBranch = {
     footerParagraph:
       'Surveys you are matched with will appear here so you can conduct them in the field. Use the Rewards and Profile tabs for incentives and your account.',
     footerHint: 'Tap ☰ in the header to open Settings and Help.',
+  },
+  survey: {
+    loading: 'Loading study…',
+    loadError: 'Could not open this study.',
+    submitError: 'Could not save your responses.',
+    completeError:
+      'Your answers were saved, but we could not mark the study complete. Try opening it again from Home.',
+    back: 'Back',
+    next: 'Next',
+    submit: 'Submit',
+    whyTitle: 'Why we ask',
+    multiHint: 'Select all that apply',
+    selectModalTitle: 'Choose an option',
+    selectSearchPlaceholder: 'Search',
+    selectCloseA11y: 'Close',
+    selectNoResults: 'No matches',
+    openingStudy: 'Opening…',
+    alertOpenFailedTitle: 'Cannot open study',
   },
   rewards: {
     screenTitle: 'Rewards',

@@ -40,6 +40,9 @@ export type RegisteredAppUser = {
   created_at: string;
   /** Set when Layer 0 onboarding is finished (spec). */
   layer0_completed_at?: string | null;
+  /** Set after POST claim-welcome-moment (value primer / suggested first study). */
+  welcome_moment_claimed_at?: string | null;
+  /** Set when the configured first survey is completed and the one-time bonus is credited. */
   welcome_bonus_credited_at?: string | null;
   first_study_completed_at?: string | null;
   impact_card_dismissed_at?: string | null;
